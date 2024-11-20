@@ -1,3 +1,6 @@
+using Karent.DataModel;
+using Microsoft.EntityFrameworkCore;
+
 namespace Karent.API
 {
     public class Program
@@ -12,6 +15,12 @@ namespace Karent.API
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            //SQL Server DB
+            builder.Services.AddDbContext<KarentDBContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+            });
 
             var app = builder.Build();
 
