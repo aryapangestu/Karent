@@ -89,6 +89,12 @@ namespace Karent.DataModel
                     .HasColumnName("created_on")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.ModifiedBy).HasColumnName("modified_by");
+
+                entity.Property(e => e.ModifiedOn)
+                    .HasColumnType("datetime")
+                    .HasColumnName("modified_on");
+
                 entity.Property(e => e.EndDate)
                     .HasColumnType("datetime")
                     .HasColumnName("end_date");
@@ -161,6 +167,11 @@ namespace Karent.DataModel
                 entity.ToTable("users");
 
                 entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.Name)
+                    .HasMaxLength(255)
+                    .IsUnicode(false)
+                    .HasColumnName("name");
 
                 entity.Property(e => e.Address)
                     .HasMaxLength(255)
