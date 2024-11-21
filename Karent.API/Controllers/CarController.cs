@@ -32,13 +32,13 @@ namespace Karent.API.Controllers
                 }
                 else
                 {
-                    _logger.LogWarning("CarController.GetAll: {Message}", response.Message);
+                    _logger.LogWarning("Failed to get all cars: {Message}", response.Message);
                     return BadRequest(response);
                 }
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "CarController.GetAll: An error occurred.");
+                _logger.LogError(e, "An error occurred while fetching all cars.");
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }
@@ -56,13 +56,13 @@ namespace Karent.API.Controllers
                 }
                 else
                 {
-                    _logger.LogWarning("CarController.GetByFilter: {Message}", response.Message);
+                    _logger.LogWarning("Failed to get car with filter '{Filter}': {Message}", filter, response.Message);
                     return BadRequest(response);
                 }
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "CarController.GetByFilter: An error occurred.");
+                _logger.LogError(e, "An error occurred while fetching cars by filter '{Filter}'.", filter);
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }
@@ -80,13 +80,13 @@ namespace Karent.API.Controllers
                 }
                 else
                 {
-                    _logger.LogWarning("CarController.GetById: {Message}", response.Message);
+                    _logger.LogWarning("Car with ID '{Id}' not found: {Message}", id, response.Message);
                     return BadRequest(response);
                 }
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "CarController.GetById: An error occurred.");
+                _logger.LogError(e, "An error occurred while fetching car by ID '{Id}'.", id);
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }
@@ -115,13 +115,13 @@ namespace Karent.API.Controllers
                 }
                 else
                 {
-                    _logger.LogWarning("CarController.Create: {Message}", response.Message);
+                    _logger.LogWarning("Failed to create car: {Message}", response.Message);
                     return BadRequest(response);
                 }
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "CarController.Create: An error occurred.");
+                _logger.LogError(e, "An error occurred while creating a car.");
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }
@@ -150,13 +150,13 @@ namespace Karent.API.Controllers
                 }
                 else
                 {
-                    _logger.LogWarning("CarController.Update: {Message}", response.Message);
+                    _logger.LogWarning("Failed to update car: {Message}", response.Message);
                     return BadRequest(response);
                 }
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "CarController.Update: An error occurred.");
+                _logger.LogError(e, "An error occurred while updating a car.");
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }
@@ -174,13 +174,13 @@ namespace Karent.API.Controllers
                 }
                 else
                 {
-                    _logger.LogWarning("CarController.Delete: {Message}", response.Message);
+                    _logger.LogWarning("Failed to delete car with ID '{Id}': {Message}", id, response.Message);
                     return BadRequest(response);
                 }
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "CarController.Delete: An error occurred.");
+                _logger.LogError(e, "An error occurred while deleting car with ID '{Id}'.", id);
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }
