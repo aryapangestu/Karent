@@ -14,4 +14,8 @@
     <ProjectReference Include="..\Karent.DataModel\Karent.DataModel.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Enums\" />
+  </ItemGroup>
+
 </Project>
