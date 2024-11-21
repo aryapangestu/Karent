@@ -149,7 +149,6 @@ namespace Karent.DataAccess
             {
                 dbTran.Rollback();
                 response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
-                // Log error (tambahkan mekanisme logging di sini)
             }
 
             return response;
@@ -206,7 +205,7 @@ namespace Karent.DataAccess
                 carToUpdate.ModifiedBy = model.ModifiedBy;
                 carToUpdate.ModifiedOn = DateTime.Now;
 
-                // Simpan perubahan
+                _db.Cars.Update(carToUpdate);
                 _db.SaveChanges();
                 dbTran.Commit();
 
@@ -218,7 +217,6 @@ namespace Karent.DataAccess
             {
                 dbTran.Rollback();
                 response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
-                // Log error (tambahkan mekanisme logging)
             }
 
             return response;
@@ -269,7 +267,6 @@ namespace Karent.DataAccess
             {
                 dbTran.Rollback();
                 response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
-                // Log error di sini (contoh: _logger.LogError(ex, "Error during Car deletion"));
             }
 
             return response;
