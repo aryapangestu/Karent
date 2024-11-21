@@ -8,14 +8,14 @@ namespace Karent.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RentalController : ControllerBase
+    public class RentalReturnController : ControllerBase
     {
-        private DARental _rentalService;
-        private readonly ILogger<RentalController> _logger;
+        private DARentalReturn _rentalReturnService;
+        private readonly ILogger<RentalReturnController> _logger;
 
-        public RentalController(KarentDBContext db, ILogger<RentalController> logger)
+        public RentalReturnController(KarentDBContext db, ILogger<RentalReturnController> logger)
         {
-            _rentalService = new DARental(db);
+            _rentalReturnService = new DARentalReturn(db);
             _logger = logger;
         }
 
@@ -24,7 +24,7 @@ namespace Karent.API.Controllers
         {
             try
             {
-                VMResponse<List<VMRental>> response = await Task.Run(() => _rentalService.GetByFilter(string.Empty));
+                VMResponse<List<VMRentalReturn>> response = await Task.Run(() => _rentalReturnService.GetByFilter(string.Empty));
 
                 if (response.Data != null && response.Data.Count > 0)
                 {
@@ -32,13 +32,13 @@ namespace Karent.API.Controllers
                 }
                 else
                 {
-                    _logger.LogWarning("Failed to get all rentals: {Message}", response.Message);
+                    _logger.LogWarning("Failed to get all rental returns: {Message}", response.Message);
                     return BadRequest(response);
                 }
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "An error occurred while fetching all rentals.");
+                _logger.LogError(e, "An error occurred while fetching all rental returns.");
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }
@@ -48,7 +48,7 @@ namespace Karent.API.Controllers
         {
             try
             {
-                VMResponse<List<VMRental>> response = await Task.Run(() => _rentalService.GetByFilter(filter));
+                VMResponse<List<VMRentalReturn>> response = await Task.Run(() => _rentalReturnService.GetByFilter(filter));
 
                 if (response.Data != null && response.Data.Count > 0)
                 {
@@ -56,13 +56,13 @@ namespace Karent.API.Controllers
                 }
                 else
                 {
-                    _logger.LogWarning("Failed to get rentals with filter '{Filter}': {Message}", filter, response.Message);
+                    _logger.LogWarning("Failed to get rental returns with filter '{Filter}': {Message}", filter, response.Message);
                     return BadRequest(response);
                 }
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "An error occurred while fetching rentals by filter '{Filter}'.", filter);
+                _logger.LogError(e, "An error occurred while fetching rental returns by filter '{Filter}'.", filter);
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }
@@ -72,7 +72,7 @@ namespace Karent.API.Controllers
         {
             try
             {
-                VMResponse<VMRental> response = await Task.Run(() => _rentalService.GetById(id));
+                VMResponse<VMRentalReturn> response = await Task.Run(() => _rentalReturnService.GetById(id));
 
                 if (response.Data != null)
                 {
@@ -80,29 +80,29 @@ namespace Karent.API.Controllers
                 }
                 else
                 {
-                    _logger.LogWarning("Rental with ID '{Id}' not found: {Message}", id, response.Message);
+                    _logger.LogWarning("Rental return with ID '{Id}' not found: {Message}", id, response.Message);
                     return BadRequest(response);
                 }
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "An error occurred while fetching rental by ID '{Id}'.", id);
+                _logger.LogError(e, "An error occurred while fetching rental return by ID '{Id}'.", id);
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create(VMRental model)
+        public async Task<ActionResult> Create(VMRentalReturn model)
         {
             if (model == null)
             {
                 _logger.LogWarning("Create operation received null model.");
-                return BadRequest("Rental model is null.");
+                return BadRequest("Rental return model is null.");
             }
 
             try
             {
-                VMResponse<VMRental> response = await Task.Run(() => _rentalService.Create(model));
+                VMResponse<VMRentalReturn> response = await Task.Run(() => _rentalReturnService.Create(model));
 
                 if (response.StatusCode == HttpStatusCode.Created)
                 {
@@ -110,30 +110,30 @@ namespace Karent.API.Controllers
                 }
                 else
                 {
-                    _logger.LogWarning("Failed to create rental: {Message}", response.Message);
+                    _logger.LogWarning("Failed to create rental return: {Message}", response.Message);
                     return BadRequest(response);
                 }
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "An error occurred while creating a rental.");
+                _logger.LogError(e, "An error occurred while creating a rental return.");
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }
 
         [HttpPut]
-        public async Task<ActionResult> Update(VMRental model)
+        public async Task<ActionResult> Update(VMRentalReturn model)
         {
             if (model == null)
             {
                 _logger.LogWarning("Update operation received invalid model.");
-                return BadRequest("Invalid rental data.");
+                return BadRequest("Invalid rental return data.");
             }
 
             try
             {
 
-                VMResponse<VMRental> response = await Task.Run(() => _rentalService.Update(model));
+                VMResponse<VMRentalReturn> response = await Task.Run(() => _rentalReturnService.Update(model));
 
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
@@ -141,13 +141,13 @@ namespace Karent.API.Controllers
                 }
                 else
                 {
-                    _logger.LogWarning("Failed to update rental: {Message}", response.Message);
+                    _logger.LogWarning("Failed to update rental return: {Message}", response.Message);
                     return BadRequest(response);
                 }
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "An error occurred while updating a rental.");
+                _logger.LogError(e, "An error occurred while updating a rental return.");
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }
@@ -157,7 +157,7 @@ namespace Karent.API.Controllers
         {
             try
             {
-                VMResponse<VMRental> response = await Task.Run(() => _rentalService.Delete(id));
+                VMResponse<VMRentalReturn> response = await Task.Run(() => _rentalReturnService.Delete(id));
 
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
@@ -165,13 +165,13 @@ namespace Karent.API.Controllers
                 }
                 else
                 {
-                    _logger.LogWarning("Failed to delete rental with ID '{Id}': {Message}", id, response.Message);
+                    _logger.LogWarning("Failed to delete rental return with ID '{Id}': {Message}", id, response.Message);
                     return BadRequest(response);
                 }
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "An error occurred while deleting rental with ID '{Id}'.", id);
+                _logger.LogError(e, "An error occurred while deleting rental return with ID '{Id}'.", id);
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }

@@ -56,7 +56,7 @@ namespace Karent.API.Controllers
                 }
                 else
                 {
-                    _logger.LogWarning("Failed to get car with filter '{Filter}': {Message}", filter, response.Message);
+                    _logger.LogWarning("Failed to get cars with filter '{Filter}': {Message}", filter, response.Message);
                     return BadRequest(response);
                 }
             }
