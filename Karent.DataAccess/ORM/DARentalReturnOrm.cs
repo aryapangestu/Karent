@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Runtime.ConstrainedExecution;
-using System.Text;
-using System.Threading.Tasks;
-using Karent.DataAccess.Interfaces;
+﻿using Karent.DataAccess.Interfaces;
 using Karent.DataModel;
 using Karent.ViewModel;
+using System.Net;
 
 namespace Karent.DataAccess.ORM
 {
@@ -32,11 +26,11 @@ namespace Karent.DataAccess.ORM
                     join u in _db.Users on r.UserId equals u.Id
                     join c in _db.Cars on r.CarId equals c.Id
                     where
-                        
+
                             c.Brand.Contains(filter)
                             || c.Model.Contains(filter)
                             || u.Name.Contains(filter)
-                        
+
                     select VMRentalReturn.FromDataModel(rr, r, u, c)
                 ).ToList();
 

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Karent.DataModel
+﻿namespace Karent.DataModel
 {
     public partial class Rental
     {

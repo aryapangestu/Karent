@@ -2,13 +2,7 @@
 using Karent.DataModel;
 using Karent.ViewModel;
 using Karent.ViewModel.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Karent.DataAccess.ORM
 {

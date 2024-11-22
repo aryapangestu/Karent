@@ -1,6 +1,5 @@
 ﻿using Karent.DataAccess.Interfaces;
 using Karent.DataAccess.NativeQuery;
-using Karent.DataAccess.ORM;
 using Karent.DataModel;
 using Karent.ViewModel;
 using Microsoft.AspNetCore.Mvc;

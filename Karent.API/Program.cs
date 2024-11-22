@@ -1,6 +1,3 @@
-using Karent.DataAccess.Interfaces;
-using Karent.DataAccess.NativeQuery;
-using Karent.DataAccess.ORM;
 using Karent.DataModel;
 using Microsoft.EntityFrameworkCore;
 

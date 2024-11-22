@@ -1,6 +1,6 @@
-﻿using System.Diagnostics;
-using Karent.Web.Models;
+﻿using Karent.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace Karent.Web.Controllers
 {
