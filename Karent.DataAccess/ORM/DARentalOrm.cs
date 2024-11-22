@@ -1,4 +1,5 @@
-﻿using Karent.DataModel;
+﻿using Karent.DataAccess.Interfaces;
+using Karent.DataModel;
 using Karent.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Karent.DataAccess.ORM
 {
-    public class DARentalOrm
+    public class DARentalOrm : IDARental
     {
         private readonly KarentDBContext _db;
 

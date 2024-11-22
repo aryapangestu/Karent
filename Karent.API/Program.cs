@@ -26,8 +26,7 @@ namespace Karent.API
             });
 
             // Tambahkan service DI
-            builder.Services.AddScoped<IDACar, DACarOrm>();
-            builder.Services.AddScoped<IDACar, DACarNativeQuery>();
+            builder.Services.AddDataAccessServices();
 
             var app = builder.Build();
 

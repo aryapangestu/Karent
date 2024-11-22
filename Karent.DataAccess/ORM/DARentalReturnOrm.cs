@@ -5,12 +5,13 @@ using System.Net;
 using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
+using Karent.DataAccess.Interfaces;
 using Karent.DataModel;
 using Karent.ViewModel;
 
 namespace Karent.DataAccess.ORM
 {
-    public class DARentalReturnOrm
+    public class DARentalReturnOrm : IDARentalReturn
     {
         private readonly KarentDBContext _db;
 

@@ -1,4 +1,5 @@
-﻿using Karent.DataModel;
+﻿using Karent.DataAccess.Interfaces;
+using Karent.DataModel;
 using Karent.ViewModel;
 using Karent.ViewModel.Helpers;
 using System;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Karent.DataAccess.ORM
 {
-    public class DAUserOrm
+    public class DAUserOrm : IDAUser
     {
         private readonly KarentDBContext _db;
 

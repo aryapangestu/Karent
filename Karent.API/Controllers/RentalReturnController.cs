@@ -1,4 +1,5 @@
-﻿using Karent.DataAccess.ORM;
+﻿using Karent.DataAccess.Interfaces;
+using Karent.DataAccess.ORM;
 using Karent.DataModel;
 using Karent.ViewModel;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +11,7 @@ namespace Karent.API.Controllers
     [ApiController]
     public class RentalReturnController : ControllerBase
     {
-        private DARentalReturnOrm _rentalReturnService;
+        private IDARentalReturn _rentalReturnService;
         private readonly ILogger<RentalReturnController> _logger;
 
         public RentalReturnController(KarentDBContext db, ILogger<RentalReturnController> logger)
