@@ -27,8 +27,8 @@ namespace Karent.DataAccess.NativeQuery
             try
             {
                 var sql = @"
-                    SELECT * FROM cars
-                    WHERE brand LIKE {0} OR model LIKE {0}";
+                        SELECT * FROM cars
+                        WHERE brand LIKE @p0 OR model LIKE @p0"; // @p Parameterized Queries
 
                 var cars = _db.Cars
                     .FromSqlRaw(sql, $"%{filter}%")
@@ -69,7 +69,7 @@ namespace Karent.DataAccess.NativeQuery
 
             try
             {
-                var sql = "SELECT * FROM cars WHERE id = {0}";
+                var sql = "SELECT * FROM cars WHERE id = @p0";
 
                 var car = _db.Cars
                     .FromSqlRaw(sql, id)
@@ -113,8 +113,8 @@ namespace Karent.DataAccess.NativeQuery
             {
                 // Pengecekan duplikasi
                 var sqlDuplicateCheck = @"
-                    SELECT COUNT(1) as Id FROM cars
-                    WHERE LOWER(brand) = {0} AND LOWER(model) = {1} AND year = {2}";
+                        SELECT COUNT(1) as Id FROM cars
+                        WHERE LOWER(brand) = @p0 AND LOWER(model) = @p1 AND year = @p2";
 
                 var duplicateCount = _db.Cars
                     .FromSqlRaw(sqlDuplicateCheck, model.Brand.ToLower(), model.Model.ToLower(), model.Year)
@@ -130,10 +130,10 @@ namespace Karent.DataAccess.NativeQuery
 
                 // Pembuatan record baru menggunakan native query
                 var insertSql = @"
-                    INSERT INTO cars (brand, model, year, plate_number, rental_rate_per_day, late_rate_per_day, status, created_by, created_on)
-                    VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8});
-                    SELECT CAST(SCOPE_IDENTITY() as int) AS Id;
-                ";
+                        INSERT INTO cars (brand, model, year, plate_number, rental_rate_per_day, late_rate_per_day, status, created_by, created_on)
+                        VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8);
+                        SELECT CAST(SCOPE_IDENTITY() as int) AS Id;
+                    ";
 
                 var newId = _db.Database
                     .ExecuteSqlRaw(insertSql,
@@ -186,7 +186,7 @@ namespace Karent.DataAccess.NativeQuery
             try
             {
                 // Cek keberadaan data
-                var sqlGetCar = "SELECT COUNT(1) as Id FROM cars WHERE id = {0}";
+                var sqlGetCar = "SELECT COUNT(1) as Id FROM cars WHERE id = @p0";
 
                 var existsCount = _db.Cars
                     .FromSqlRaw(sqlGetCar, model.Id)
@@ -202,8 +202,8 @@ namespace Karent.DataAccess.NativeQuery
 
                 // Pengecekan duplikasi
                 var sqlDuplicateCheck = @"
-                    SELECT COUNT(1) as Id FROM cars
-                    WHERE LOWER(brand) = {0} AND LOWER(model) = {1} AND year = {2}";
+                        SELECT COUNT(1) as Id FROM cars
+                        WHERE LOWER(brand) = @p0 AND LOWER(model) = @p1 AND year = @p2";
 
                 var duplicateCount = _db.Cars
                     .FromSqlRaw(sqlDuplicateCheck, model.Brand.ToLower(), model.Model.ToLower(), model.Year)
@@ -219,18 +219,18 @@ namespace Karent.DataAccess.NativeQuery
 
                 // Update data menggunakan native query
                 var updateSql = @"
-                    UPDATE Cars SET
-                        brand = {1},
-                        model = {2},
-                        year = {3},
-                        plate_number = {4},
-                        rental_rate_per_day = {5},
-                        late_rate_per_day = {6},
-                        status = {7},
-                        modified_by = {8},
-                        modified_on = {9}
-                    WHERE id = {0};
-                ";
+                        UPDATE cars SET
+                            brand = @p1,
+                            model = @p2,
+                            year = @p3,
+                            plate_number = @p4,
+                            rental_rate_per_day = @p5,
+                            late_rate_per_day = @p6,
+                            status = @p7,
+                            modified_by = @p8,
+                            modified_on = @p9
+                        WHERE id = @p0;
+                    ";
 
                 _db.Database.ExecuteSqlRaw(updateSql,
                     model.Id,
@@ -275,7 +275,7 @@ namespace Karent.DataAccess.NativeQuery
             try
             {
                 // Cek keberadaan data
-                var sqlGetCar = "SELECT COUNT(1) as Id FROM cars WHERE id = {0}";
+                var sqlGetCar = "SELECT COUNT(1) as Id FROM cars WHERE id = @p0";
 
                 var existsCount = _db.Cars
                     .FromSqlRaw(sqlGetCar, id)
@@ -290,7 +290,7 @@ namespace Karent.DataAccess.NativeQuery
                 }
 
                 // Periksa apakah entri sedang digunakan
-                var sqlCheckInUse = "SELECT COUNT(1) as Id FROM rentals WHERE car_id = {0}";
+                var sqlCheckInUse = "SELECT COUNT(1) as Id FROM rentals WHERE car_id = @p0";
 
                 var inUseCount = _db.Rentals
                     .FromSqlRaw(sqlCheckInUse, id)
@@ -305,7 +305,7 @@ namespace Karent.DataAccess.NativeQuery
                 }
 
                 // Hapus entri menggunakan native query
-                var deleteSql = "DELETE FROM cars WHERE id = {0}";
+                var deleteSql = "DELETE FROM cars WHERE id = @p0";
 
                 _db.Database.ExecuteSqlRaw(deleteSql, id);
 
