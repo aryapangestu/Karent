@@ -1,4 +1,6 @@
-﻿using Karent.DataAccess;
+﻿using Karent.DataAccess.Interfaces;
+using Karent.DataAccess.NativeQuery;
+using Karent.DataAccess.ORM;
 using Karent.DataModel;
 using Karent.ViewModel;
 using Microsoft.AspNetCore.Mvc;
@@ -10,12 +12,13 @@ namespace Karent.API.Controllers
     [ApiController]
     public class CarController : ControllerBase
     {
-        private DACar _carService;
+        private IDACar _carService;
         private readonly ILogger<CarController> _logger;
 
         public CarController(KarentDBContext db, ILogger<CarController> logger)
         {
-            _carService = new DACar(db);
+            //_carService = new DACarOrm(db);
+            _carService = new DACarNativeQuery(db);
             _logger = logger;
         }
 

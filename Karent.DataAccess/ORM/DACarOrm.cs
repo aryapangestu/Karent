@@ -6,17 +6,18 @@ using System.Net;
 using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
+using Karent.DataAccess.Interfaces;
 using Karent.DataModel;
 using Karent.ViewModel;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace Karent.DataAccess
+namespace Karent.DataAccess.ORM
 {
-    public class DACar
+    public class DACarOrm : IDACar
     {
         private readonly KarentDBContext _db;
 
-        public DACar(KarentDBContext db)
+        public DACarOrm(KarentDBContext db)
         {
             _db = db;
         }
@@ -29,7 +30,7 @@ namespace Karent.DataAccess
             {
                 var cars = (
                     from c in _db.Cars
-                    where (c.Brand.Contains(filter) || c.Model.Contains(filter))
+                    where c.Brand.Contains(filter) || c.Model.Contains(filter)
                     select VMCar.FromDataModel(c)
                 ).ToList();
 

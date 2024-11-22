@@ -9,13 +9,13 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Karent.DataAccess
+namespace Karent.DataAccess.ORM
 {
-    public class DAUser
+    public class DAUserOrm
     {
         private readonly KarentDBContext _db;
 
-        public DAUser(KarentDBContext db)
+        public DAUserOrm(KarentDBContext db)
         {
             _db = db;
         }
@@ -28,7 +28,7 @@ namespace Karent.DataAccess
             {
                 var users = (
                     from u in _db.Users
-                    where (u.Name.Contains(filter) || u.Email.Contains(filter))
+                    where u.Name.Contains(filter) || u.Email.Contains(filter)
                     select VMUser.FromDataModel(u)
                 ).ToList();
 

@@ -1,54 +1,48 @@
-﻿using System;
+﻿using Karent.DataModel;
+using Karent.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
-using Karent.DataModel;
-using Karent.ViewModel;
 
-namespace Karent.DataAccess
+namespace Karent.DataAccess.ORM
 {
-    public class DARentalReturn
+    public class DARentalOrm
     {
         private readonly KarentDBContext _db;
 
-        public DARentalReturn(KarentDBContext db)
+        public DARentalOrm(KarentDBContext db)
         {
             _db = db;
         }
 
-        public VMResponse<List<VMRentalReturn>> GetByFilter(string filter)
+        public VMResponse<List<VMRental>> GetByFilter(string filter)
         {
-            VMResponse<List<VMRentalReturn>> response = new VMResponse<List<VMRentalReturn>>();
+            VMResponse<List<VMRental>> response = new VMResponse<List<VMRental>>();
 
             try
             {
-                var rentalReturns = (
-                    from rr in _db.RentalReturns
-                    join r in _db.Rentals on rr.RentalId equals r.Id
+                var rentals = (
+                    from r in _db.Rentals
                     join u in _db.Users on r.UserId equals u.Id
                     join c in _db.Cars on r.CarId equals c.Id
-                    where
-                        (
-                            c.Brand.Contains(filter)
-                            || c.Model.Contains(filter)
-                            || u.Name.Contains(filter)
-                        )
-                    select VMRentalReturn.FromDataModel(rr, r, u, c)
+                    where c.Brand.Contains(filter) || c.Model.Contains(filter) || u.Name.Contains(filter)
+                    select VMRental.FromDataModel(r, u, c)
                 ).ToList();
 
-                if (rentalReturns.Count > 0)
+                if (rentals.Count > 0)
                 {
-                    response.Data = rentalReturns;
+                    response.Data = rentals;
                     response.Message =
-                        $"{HttpStatusCode.OK} - {rentalReturns.Count} Rental Return data(s) successfully fetched";
+                        $"{HttpStatusCode.OK} - {rentals.Count} Rental data(s) successfully fetched";
                     response.StatusCode = HttpStatusCode.OK;
                 }
                 else
                 {
-                    response.Message = $"{HttpStatusCode.NoContent} - No Rental Return found";
+                    response.Message = $"{HttpStatusCode.NoContent} - No Rental found";
                     response.StatusCode = HttpStatusCode.NoContent;
                 }
             }
@@ -60,39 +54,37 @@ namespace Karent.DataAccess
             return response;
         }
 
-        public VMResponse<VMRentalReturn> GetById(int id)
+        public VMResponse<VMRental> GetById(int id)
         {
-            VMResponse<VMRentalReturn> response = new VMResponse<VMRentalReturn>();
+            VMResponse<VMRental> response = new VMResponse<VMRental>();
 
             // Validasi awal untuk ID
             if (id <= 0)
             {
-                response.Message = $"{HttpStatusCode.BadRequest} - Invalid Rental Return ID";
+                response.Message = $"{HttpStatusCode.BadRequest} - Invalid Rental ID";
                 response.StatusCode = HttpStatusCode.BadRequest;
                 return response;
             }
 
             try
             {
-                var rentalReturn = (
-                    from rr in _db.RentalReturns
-                    join r in _db.Rentals on rr.RentalId equals r.Id
+                var rental = (
+                    from r in _db.Rentals
                     join u in _db.Users on r.UserId equals u.Id
                     join c in _db.Cars on r.CarId equals c.Id
-                    where rr.Id == id
-                    select VMRentalReturn.FromDataModel(rr, r, u, c)
+                    where r.Id == id
+                    select VMRental.FromDataModel(r, u, c)
                 ).FirstOrDefault();
 
-                if (rentalReturn != null)
+                if (rental != null)
                 {
-                    response.Data = rentalReturn;
-                    response.Message =
-                        $"{HttpStatusCode.OK} - Rental Return data successfully fetched";
+                    response.Data = rental;
+                    response.Message = $"{HttpStatusCode.OK} - Rental data successfully fetched";
                     response.StatusCode = HttpStatusCode.OK;
                 }
                 else
                 {
-                    response.Message = $"{HttpStatusCode.NoContent} - Rental Return not found";
+                    response.Message = $"{HttpStatusCode.NoContent} - Rental not found";
                     response.StatusCode = HttpStatusCode.NoContent;
                 }
             }
@@ -104,9 +96,9 @@ namespace Karent.DataAccess
             return response;
         }
 
-        public VMResponse<VMRentalReturn> Create(VMRentalReturn model)
+        public VMResponse<VMRental> Create(VMRental model)
         {
-            var response = new VMResponse<VMRentalReturn>();
+            var response = new VMResponse<VMRental>();
 
             // Validasi input
             if (!model.IsValid(out string validationMessage))
@@ -120,24 +112,24 @@ namespace Karent.DataAccess
             try
             {
                 // Pembuatan record baru
-                var newRentalReturn = new RentalReturn
+                var newRental = new Rental
                 {
                     Id = model.Id,
-                    RentalId = model.RentalId,
-                    ReturnDate = model.ReturnDate,
-                    LateFee = model.LateFee,
+                    UserId = model.UserId,
+                    CarId = model.CarId,
+                    StartDate = model.StartDate,
+                    EndDate = model.EndDate,
                     TotalFee = model.TotalFee,
                     CreatedBy = model.CreatedBy,
                     CreatedOn = DateTime.Now,
                 };
 
-                _db.RentalReturns.Add(newRentalReturn);
+                _db.Rentals.Add(newRental);
                 _db.SaveChanges();
                 dbTran.Commit();
 
-                response.Data = GetById(newRentalReturn.Id).Data;
-                response.Message =
-                    $"{HttpStatusCode.Created} - Rental Return data successfully inserted";
+                response.Data = GetById(newRental.Id).Data;
+                response.Message = $"{HttpStatusCode.Created} - Rental data successfully inserted";
                 response.StatusCode = HttpStatusCode.Created;
             }
             catch (Exception ex)
@@ -149,9 +141,9 @@ namespace Karent.DataAccess
             return response;
         }
 
-        public VMResponse<VMRentalReturn> Update(VMRentalReturn model)
+        public VMResponse<VMRental> Update(VMRental model)
         {
-            var response = new VMResponse<VMRentalReturn>();
+            var response = new VMResponse<VMRental>();
 
             // Validasi input
             if (!model.IsValid(out string validationMessage))
@@ -165,29 +157,30 @@ namespace Karent.DataAccess
             try
             {
                 // Cari data yang akan diupdate
-                var rentalReturnToUpdate = _db.RentalReturns.Find(model.Id);
-                if (rentalReturnToUpdate == null)
+                var rentalToUpdate = _db.Rentals.Find(model.Id);
+                if (rentalToUpdate == null)
                 {
-                    response.Message = $"{HttpStatusCode.NotFound} - Rental Return not found";
+                    response.Message = $"{HttpStatusCode.NotFound} - Rental not found";
                     response.StatusCode = HttpStatusCode.NotFound;
                     return response;
                 }
 
                 // Update data
-                rentalReturnToUpdate.Id = model.Id;
-                rentalReturnToUpdate.RentalId = model.RentalId;
-                rentalReturnToUpdate.ReturnDate = model.ReturnDate;
-                rentalReturnToUpdate.LateFee = model.LateFee;
-                rentalReturnToUpdate.TotalFee = model.TotalFee;
-                rentalReturnToUpdate.ModifiedBy = model.ModifiedBy;
-                rentalReturnToUpdate.ModifiedOn = DateTime.Now;
+                rentalToUpdate.Id = model.Id;
+                rentalToUpdate.UserId = model.UserId;
+                rentalToUpdate.CarId = model.CarId;
+                rentalToUpdate.StartDate = model.StartDate;
+                rentalToUpdate.EndDate = model.EndDate;
+                rentalToUpdate.TotalFee = model.TotalFee;
+                rentalToUpdate.ModifiedBy = model.ModifiedBy;
+                rentalToUpdate.ModifiedOn = DateTime.Now;
 
-                _db.RentalReturns.Update(rentalReturnToUpdate);
+                _db.Rentals.Update(rentalToUpdate);
                 _db.SaveChanges();
                 dbTran.Commit();
 
-                response.Data = GetById(rentalReturnToUpdate.Id).Data;
-                response.Message = $"{HttpStatusCode.OK} - Rental Return data successfully updated";
+                response.Data = GetById(rentalToUpdate.Id).Data;
+                response.Message = $"{HttpStatusCode.OK} - Rental data successfully updated";
                 response.StatusCode = HttpStatusCode.OK;
             }
             catch (Exception ex)
@@ -199,13 +192,13 @@ namespace Karent.DataAccess
             return response;
         }
 
-        public VMResponse<VMRentalReturn> Delete(int id)
+        public VMResponse<VMRental> Delete(int id)
         {
-            var response = new VMResponse<VMRentalReturn>();
+            var response = new VMResponse<VMRental>();
 
             if (id <= 0)
             {
-                response.Message = $"{HttpStatusCode.BadRequest} - Invalid Rental Return ID";
+                response.Message = $"{HttpStatusCode.BadRequest} - Invalid Rental ID";
                 response.StatusCode = HttpStatusCode.BadRequest;
                 return response;
             }
@@ -214,20 +207,30 @@ namespace Karent.DataAccess
             try
             {
                 // Cari entri berdasarkan ID
-                var rentalReturnToDelete = _db.RentalReturns.Find(id);
-                if (rentalReturnToDelete == null)
+                var rentalToDelete = _db.Rentals.Find(id);
+                if (rentalToDelete == null)
                 {
-                    response.Message = $"{HttpStatusCode.NotFound} - Rental Return not found";
+                    response.Message = $"{HttpStatusCode.NotFound} - Rental not found";
                     response.StatusCode = HttpStatusCode.NotFound;
                     return response;
                 }
 
+                // Periksa apakah entri sedang digunakan
+                bool isInUse = _db.RentalReturns.Any(r => r.RentalId == id);
+                if (isInUse)
+                {
+                    response.Message =
+                        $"{HttpStatusCode.Conflict} - Rental is currently in use and cannot be deleted.";
+                    response.StatusCode = HttpStatusCode.Conflict;
+                    return response;
+                }
+
                 // Hapus entri
-                _db.RentalReturns.Remove(rentalReturnToDelete);
+                _db.Rentals.Remove(rentalToDelete);
                 _db.SaveChanges();
                 dbTran.Commit();
 
-                response.Message = $"{HttpStatusCode.OK} - Rental Return data successfully deleted";
+                response.Message = $"{HttpStatusCode.OK} - Rental data successfully deleted";
                 response.StatusCode = HttpStatusCode.OK;
             }
             catch (Exception ex)

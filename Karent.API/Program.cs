@@ -1,3 +1,6 @@
+using Karent.DataAccess.Interfaces;
+using Karent.DataAccess.NativeQuery;
+using Karent.DataAccess.ORM;
 using Karent.DataModel;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +24,10 @@ namespace Karent.API
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
+
+            // Tambahkan service DI
+            builder.Services.AddScoped<IDACar, DACarOrm>();
+            builder.Services.AddScoped<IDACar, DACarNativeQuery>();
 
             var app = builder.Build();
 

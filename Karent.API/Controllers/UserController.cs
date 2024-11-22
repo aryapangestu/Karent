@@ -1,4 +1,4 @@
-﻿using Karent.DataAccess;
+﻿using Karent.DataAccess.ORM;
 using Karent.DataModel;
 using Karent.ViewModel;
 using Microsoft.AspNetCore.Mvc;
@@ -10,12 +10,12 @@ namespace Karent.API.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private DAUser _userService;
+        private DAUserOrm _userService;
         private readonly ILogger<UserController> _logger;
 
         public UserController(KarentDBContext db, ILogger<UserController> logger)
         {
-            _userService = new DAUser(db);
+            _userService = new DAUserOrm(db);
             _logger = logger;
 
         }

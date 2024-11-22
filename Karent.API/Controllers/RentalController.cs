@@ -1,4 +1,4 @@
-﻿using Karent.DataAccess;
+﻿using Karent.DataAccess.ORM;
 using Karent.DataModel;
 using Karent.ViewModel;
 using Microsoft.AspNetCore.Mvc;
@@ -10,12 +10,12 @@ namespace Karent.API.Controllers
     [ApiController]
     public class RentalController : ControllerBase
     {
-        private DARental _rentalService;
+        private DARentalOrm _rentalService;
         private readonly ILogger<RentalController> _logger;
 
         public RentalController(KarentDBContext db, ILogger<RentalController> logger)
         {
-            _rentalService = new DARental(db);
+            _rentalService = new DARentalOrm(db);
             _logger = logger;
         }
 
