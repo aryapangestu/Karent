@@ -15,6 +15,8 @@ namespace Karent.API.Extensions
 
             services.AddScoped<IDACar, DACarNativeQuery>();
             services.AddScoped<IDARental, DARentalNativeQuery>();
+            services.AddScoped<IDARentalReturn, DARentalReturnNativeQuery>();
+            services.AddScoped<IDAUser, DAUserNativeQuery>();
 
             return services;
         }

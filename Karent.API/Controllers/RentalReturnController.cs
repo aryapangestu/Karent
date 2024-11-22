@@ -1,4 +1,5 @@
 ﻿using Karent.DataAccess.Interfaces;
+using Karent.DataAccess.NativeQuery;
 using Karent.DataAccess.ORM;
 using Karent.DataModel;
 using Karent.ViewModel;
@@ -16,7 +17,8 @@ namespace Karent.API.Controllers
 
         public RentalReturnController(KarentDBContext db, ILogger<RentalReturnController> logger)
         {
-            _rentalReturnService = new DARentalReturnOrm(db);
+            //_rentalReturnService = new DARentalReturnOrm(db);
+            _rentalReturnService = new DARentalReturnNativeQuery(db);
             _logger = logger;
         }
 

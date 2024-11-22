@@ -1,4 +1,5 @@
 ﻿using Karent.DataAccess.Interfaces;
+using Karent.DataAccess.NativeQuery;
 using Karent.DataAccess.ORM;
 using Karent.DataModel;
 using Karent.ViewModel;
@@ -16,7 +17,8 @@ namespace Karent.API.Controllers
 
         public UserController(KarentDBContext db, ILogger<UserController> logger)
         {
-            _userService = new DAUserOrm(db);
+            //_userService = new DAUserOrm(db);
+            _userService = new DAUserNativeQuery(db);
             _logger = logger;
 
         }
