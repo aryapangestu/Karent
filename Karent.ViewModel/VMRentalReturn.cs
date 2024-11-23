@@ -8,9 +8,9 @@ namespace Karent.ViewModel
         public int RentalId { get; set; }
 
 
-        public string UserName { get; set; } = null!;
-        public string CarBrand { get; set; } = null!;
-        public string CarModel { get; set; } = null!;
+        public string? UserName { get; set; }
+        public string? CarBrand { get; set; }
+        public string? CarModel { get; set; }
 
         public DateTime ReturnDate { get; set; }
         public decimal LateFee { get; set; }

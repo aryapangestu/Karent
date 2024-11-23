@@ -126,12 +126,12 @@ namespace Karent.DataAccess.NativeQuery
                 // Pembuatan record baru menggunakan native query
                 var insertSql = @"
                         INSERT INTO cars (brand, model, year, plate_number, rental_rate_per_day, late_rate_per_day, status, created_by, created_on)
+                        OUTPUT INSERTED.*
                         VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8);
-                        SELECT CAST(SCOPE_IDENTITY() as int) AS Id;
                     ";
 
-                var newId = _db.Database
-                    .ExecuteSqlRaw(insertSql,
+                var insertedCar = _db.Cars
+                    .FromSqlRaw(insertSql,
                         model.Brand,
                         model.Model,
                         model.Year,
@@ -140,17 +140,18 @@ namespace Karent.DataAccess.NativeQuery
                         model.LateRatePerDay,
                         model.Status,
                         model.CreatedBy ?? (object)DBNull.Value,
-                        DateTime.Now);
+                        DateTime.Now)
+                    .AsEnumerable()
+                    .FirstOrDefault();
 
-                if (newId == 0)
+                if (insertedCar == null)
                 {
                     response.Message = $"{HttpStatusCode.InternalServerError} - Failed to insert Car";
                     response.StatusCode = HttpStatusCode.InternalServerError;
                     return response;
                 }
 
-                model.Id = newId;
-                response.Data = model;
+                response.Data = GetById(insertedCar.Id).Data;
                 response.Message = $"{HttpStatusCode.Created} - Car data successfully inserted";
                 response.StatusCode = HttpStatusCode.Created;
 
@@ -239,7 +240,7 @@ namespace Karent.DataAccess.NativeQuery
                     model.ModifiedBy ?? (object)DBNull.Value,
                     DateTime.Now);
 
-                response.Data = model;
+                response.Data = GetById(model.Id).Data;
                 response.Message = $"{HttpStatusCode.OK} - Car data successfully updated";
                 response.StatusCode = HttpStatusCode.OK;
 

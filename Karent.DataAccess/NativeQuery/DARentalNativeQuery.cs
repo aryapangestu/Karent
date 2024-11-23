@@ -22,15 +22,32 @@ namespace Karent.DataAccess.NativeQuery
             try
             {
                 var sql = @"
-                        SELECT r.*, u.*, c.*
-                        FROM rentals r
-                        JOIN users u ON r.user_id = u.id
-                        JOIN cars c ON r.car_id = c.id
-                        WHERE c.brand LIKE @p0 OR c.model LIKE @p0 OR u.name LIKE @p0";
+                    SELECT r.*,
+                           u.name AS name,
+                           c.brand AS brand, c.model AS model
+                    FROM rentals r
+                    JOIN users u ON r.user_id = u.id
+                    JOIN cars c ON r.car_id = c.id
+                    WHERE c.brand LIKE @p0 OR c.model LIKE @p0 OR u.name LIKE @p0";
 
                 var rentals = _db.Rentals
                     .FromSqlRaw(sql, $"%{filter}%")
-                    .Select(r => VMRental.FromDataModel(r, r.User, r.Car))
+                    .Select(r => new VMRental
+                    {
+                        Id = r.Id,
+                        UserId = r.UserId,
+                        UserName = r.User.Name,
+                        CarId = r.CarId,
+                        CarBrand = r.Car.Brand,
+                        CarModel = r.Car.Model,
+                        StartDate = r.StartDate,
+                        EndDate = r.EndDate,
+                        TotalFee = r.TotalFee,
+                        CreatedBy = r.CreatedBy,
+                        CreatedOn = r.CreatedOn,
+                        ModifiedBy = r.ModifiedBy,
+                        ModifiedOn = r.ModifiedOn
+                    })
                     .ToList();
 
                 if (rentals.Any())
@@ -68,7 +85,9 @@ namespace Karent.DataAccess.NativeQuery
             try
             {
                 var sql = @"
-                        SELECT r.*, u.*, c.*
+                        SELECT r.*,
+                           u.name AS name,
+                           c.brand AS brand, c.model AS model
                         FROM rentals r
                         JOIN users u ON r.user_id = u.id
                         JOIN cars c ON r.car_id = c.id
@@ -76,7 +95,22 @@ namespace Karent.DataAccess.NativeQuery
 
                 var rental = _db.Rentals
                     .FromSqlRaw(sql, id)
-                    .Select(r => VMRental.FromDataModel(r, r.User, r.Car))
+                    .Select(r => new VMRental
+                    {
+                        Id = r.Id,
+                        UserId = r.UserId,
+                        UserName = r.User.Name,
+                        CarId = r.CarId,
+                        CarBrand = r.Car.Brand,
+                        CarModel = r.Car.Model,
+                        StartDate = r.StartDate,
+                        EndDate = r.EndDate,
+                        TotalFee = r.TotalFee,
+                        CreatedBy = r.CreatedBy,
+                        CreatedOn = r.CreatedOn,
+                        ModifiedBy = r.ModifiedBy,
+                        ModifiedOn = r.ModifiedOn
+                    })
                     .FirstOrDefault();
 
                 if (rental != null)
@@ -115,28 +149,31 @@ namespace Karent.DataAccess.NativeQuery
             try
             {
                 var insertSql = @"
-                        INSERT INTO rentals (user_id, car_id, start_date, end_date, total_fee, created_by, created_on)
-                        VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6);
-                        SELECT CAST(SCOPE_IDENTITY() as int) AS Id;";
+                    INSERT INTO rentals (user_id, car_id, start_date, end_date, total_fee, created_by, created_on)
+                    OUTPUT INSERTED.*
+                    VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6);";
 
-                var newId = _db.Database.ExecuteSqlRaw(insertSql,
-                    model.UserId,
-                    model.CarId,
-                    model.StartDate,
-                    model.EndDate,
-                    model.TotalFee,
-                    model.CreatedBy ?? (object)DBNull.Value,
-                    DateTime.Now);
+                // Execute the SQL and retrieve the new Id
+                var insertedRental = _db.Rentals
+                    .FromSqlRaw(insertSql,
+                        model.UserId,
+                        model.CarId,
+                        model.StartDate,
+                        model.EndDate,
+                        model.TotalFee,
+                        model.CreatedBy ?? (object)DBNull.Value,
+                        DateTime.Now)
+                    .AsEnumerable()
+                    .FirstOrDefault();
 
-                if (newId == 0)
+                if (insertedRental == null)
                 {
                     response.Message = $"{HttpStatusCode.InternalServerError} - Failed to insert Rental";
                     response.StatusCode = HttpStatusCode.InternalServerError;
                     return response;
                 }
 
-                model.Id = newId;
-                response.Data = model;
+                response.Data = GetById(insertedRental.Id).Data;
                 response.Message = $"{HttpStatusCode.Created} - Rental data successfully inserted";
                 response.StatusCode = HttpStatusCode.Created;
 
@@ -201,7 +238,7 @@ namespace Karent.DataAccess.NativeQuery
                     model.ModifiedBy ?? (object)DBNull.Value,
                     DateTime.Now);
 
-                response.Data = model;
+                response.Data = GetById(model.Id).Data;
                 response.Message = $"{HttpStatusCode.OK} - Rental data successfully updated";
                 response.StatusCode = HttpStatusCode.OK;
 
