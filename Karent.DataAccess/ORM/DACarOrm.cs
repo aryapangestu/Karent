@@ -23,7 +23,21 @@ namespace Karent.DataAccess.ORM
                 var cars = (
                     from c in _db.Cars
                     where c.Brand.Contains(filter) || c.Model.Contains(filter)
-                    select VMCar.FromDataModel(c)
+                    select new VMCar
+                    {
+                        Id = c.Id,
+                        Brand = c.Brand,
+                        Model = c.Model,
+                        Year = c.Year,
+                        PlateNumber = c.PlateNumber,
+                        RentalRatePerDay = c.RentalRatePerDay,
+                        LateRatePerDay = c.LateRatePerDay,
+                        Status = c.Status,
+                        CreatedBy = c.CreatedBy,
+                        CreatedOn = c.CreatedOn,
+                        ModifiedBy = c.ModifiedBy,
+                        ModifiedOn = c.ModifiedOn
+                    }
                 ).ToList();
 
                 if (cars.Count > 0)
@@ -64,7 +78,21 @@ namespace Karent.DataAccess.ORM
                 var car = (
                     from c in _db.Cars
                     where c.Id == id
-                    select VMCar.FromDataModel(c)
+                    select new VMCar
+                    {
+                        Id = c.Id,
+                        Brand = c.Brand,
+                        Model = c.Model,
+                        Year = c.Year,
+                        PlateNumber = c.PlateNumber,
+                        RentalRatePerDay = c.RentalRatePerDay,
+                        LateRatePerDay = c.LateRatePerDay,
+                        Status = c.Status,
+                        CreatedBy = c.CreatedBy,
+                        CreatedOn = c.CreatedOn,
+                        ModifiedBy = c.ModifiedBy,
+                        ModifiedOn = c.ModifiedOn
+                    }
                 ).FirstOrDefault();
 
                 if (car != null)
@@ -134,7 +162,21 @@ namespace Karent.DataAccess.ORM
                 _db.SaveChanges();
                 dbTran.Commit();
 
-                response.Data = VMCar.FromDataModel(newCar);
+                response.Data = new VMCar
+                {
+                    Id = newCar.Id,
+                    Brand = newCar.Brand,
+                    Model = newCar.Model,
+                    Year = newCar.Year,
+                    PlateNumber = newCar.PlateNumber,
+                    RentalRatePerDay = newCar.RentalRatePerDay,
+                    LateRatePerDay = newCar.LateRatePerDay,
+                    Status = newCar.Status,
+                    CreatedBy = newCar.CreatedBy,
+                    CreatedOn = newCar.CreatedOn,
+                    ModifiedBy = newCar.ModifiedBy,
+                    ModifiedOn = newCar.ModifiedOn
+                };
                 response.Message = $"{HttpStatusCode.Created} - Car data successfully inserted";
                 response.StatusCode = HttpStatusCode.Created;
             }
@@ -202,7 +244,21 @@ namespace Karent.DataAccess.ORM
                 _db.SaveChanges();
                 dbTran.Commit();
 
-                response.Data = VMCar.FromDataModel(carToUpdate);
+                response.Data = new VMCar
+                {
+                    Id = carToUpdate.Id,
+                    Brand = carToUpdate.Brand,
+                    Model = carToUpdate.Model,
+                    Year = carToUpdate.Year,
+                    PlateNumber = carToUpdate.PlateNumber,
+                    RentalRatePerDay = carToUpdate.RentalRatePerDay,
+                    LateRatePerDay = carToUpdate.LateRatePerDay,
+                    Status = carToUpdate.Status,
+                    CreatedBy = carToUpdate.CreatedBy,
+                    CreatedOn = carToUpdate.CreatedOn,
+                    ModifiedBy = carToUpdate.ModifiedBy,
+                    ModifiedOn = carToUpdate.ModifiedOn
+                };
                 response.Message = $"{HttpStatusCode.OK} - Car data successfully updated";
                 response.StatusCode = HttpStatusCode.OK;
             }

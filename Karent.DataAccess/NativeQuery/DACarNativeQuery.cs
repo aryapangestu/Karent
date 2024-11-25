@@ -22,12 +22,24 @@ namespace Karent.DataAccess.NativeQuery
             try
             {
                 var sql = @"
-                        SELECT * FROM cars
-                        WHERE brand LIKE @p0 OR model LIKE @p0"; // @p Parameterized Queries
+                        SELECT 
+                            c.id AS Id,
+                            c.brand AS Brand,
+                            c.model AS Model,
+                            c.year AS Year,
+                            c.plate_number AS PlateNumber,
+                            c.rental_rate_per_day AS RentalRatePerDay,
+                            c.late_rate_per_day AS LateRatePerDay,
+                            c.status AS Status,
+                            c.created_by AS CreatedBy,
+                            c.created_on AS CreatedOn,
+                            c.modified_by AS ModifiedBy,
+                            c.modified_on AS ModifiedOn
+                        FROM cars AS c
+                        WHERE c.brand LIKE @p0 OR c.model LIKE @p0"; // @p Parameterized Queries
 
-                var cars = _db.Cars
+                var cars = _db.VMCars
                     .FromSqlRaw(sql, $"%{filter}%")
-                    .Select(c => VMCar.FromDataModel(c))
                     .ToList();
 
                 if (cars.Any())
@@ -64,11 +76,25 @@ namespace Karent.DataAccess.NativeQuery
 
             try
             {
-                var sql = "SELECT * FROM cars WHERE id = @p0";
+                var sql = @"
+                        SELECT 
+                            c.id AS Id,
+                            c.brand AS Brand,
+                            c.model AS Model,
+                            c.year AS Year,
+                            c.plate_number AS PlateNumber,
+                            c.rental_rate_per_day AS RentalRatePerDay,
+                            c.late_rate_per_day AS LateRatePerDay,
+                            c.status AS Status,
+                            c.created_by AS CreatedBy,
+                            c.created_on AS CreatedOn,
+                            c.modified_by AS ModifiedBy,
+                            c.modified_on AS ModifiedOn
+                        FROM cars AS c
+                        WHERE c.id = @p0";
 
-                var car = _db.Cars
+                var car = _db.VMCars
                     .FromSqlRaw(sql, id)
-                    .Select(c => VMCar.FromDataModel(c))
                     .FirstOrDefault();
 
                 if (car != null)
@@ -108,7 +134,7 @@ namespace Karent.DataAccess.NativeQuery
             {
                 // Pengecekan duplikasi
                 var sqlDuplicateCheck = @"
-                        SELECT COUNT(1) as Id FROM cars
+                        SELECT COUNT(1) AS id FROM cars
                         WHERE LOWER(brand) = @p0 AND LOWER(model) = @p1 AND year = @p2";
 
                 var duplicateCount = _db.Cars
@@ -182,7 +208,7 @@ namespace Karent.DataAccess.NativeQuery
             try
             {
                 // Cek keberadaan data
-                var sqlGetCar = "SELECT COUNT(1) as Id FROM cars WHERE id = @p0";
+                var sqlGetCar = "SELECT COUNT(1) AS id FROM cars WHERE id = @p0";
 
                 var existsCount = _db.Cars
                     .FromSqlRaw(sqlGetCar, model.Id)
@@ -198,7 +224,7 @@ namespace Karent.DataAccess.NativeQuery
 
                 // Pengecekan duplikasi
                 var sqlDuplicateCheck = @"
-                        SELECT COUNT(1) as Id FROM cars
+                        SELECT COUNT(1) AS id FROM cars
                         WHERE LOWER(brand) = @p0 AND LOWER(model) = @p1 AND year = @p2";
 
                 var duplicateCount = _db.Cars
@@ -271,7 +297,7 @@ namespace Karent.DataAccess.NativeQuery
             try
             {
                 // Cek keberadaan data
-                var sqlGetCar = "SELECT COUNT(1) as Id FROM cars WHERE id = @p0";
+                var sqlGetCar = "SELECT COUNT(1) AS id FROM cars WHERE id = @p0";
 
                 var existsCount = _db.Cars
                     .FromSqlRaw(sqlGetCar, id)
@@ -286,7 +312,7 @@ namespace Karent.DataAccess.NativeQuery
                 }
 
                 // Periksa apakah entri sedang digunakan
-                var sqlCheckInUse = "SELECT COUNT(1) as Id FROM rentals WHERE car_id = @p0";
+                var sqlCheckInUse = "SELECT COUNT(1) AS id FROM rentals WHERE car_id = @p0";
 
                 var inUseCount = _db.Rentals
                     .FromSqlRaw(sqlCheckInUse, id)

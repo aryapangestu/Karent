@@ -24,7 +24,21 @@ namespace Karent.DataAccess.ORM
                 var users = (
                     from u in _db.Users
                     where u.Name.Contains(filter) || u.Email.Contains(filter)
-                    select VMUser.FromDataModel(u)
+                    select new VMUser
+                    {
+                        Id = u.Id,
+                        Name = u.Name,
+                        Email = u.Email,
+                        Address = u.Address,
+                        PhoneNumber = u.PhoneNumber,
+                        DrivingLicenseNumber = u.DrivingLicenseNumber,
+                        //Hide password
+                        UserType = u.UserType,
+                        CreatedBy = u.CreatedBy,
+                        CreatedOn = u.CreatedOn,
+                        ModifiedBy = u.ModifiedBy,
+                        ModifiedOn = u.ModifiedOn
+                    }
                 ).ToList();
 
                 if (users.Count > 0)
@@ -65,7 +79,21 @@ namespace Karent.DataAccess.ORM
                 var user = (
                     from u in _db.Users
                     where u.Id == id
-                    select VMUser.FromDataModel(u)
+                    select new VMUser
+                    {
+                        Id = u.Id,
+                        Name = u.Name,
+                        Email = u.Email,
+                        Address = u.Address,
+                        PhoneNumber = u.PhoneNumber,
+                        DrivingLicenseNumber = u.DrivingLicenseNumber,
+                        //Hide password
+                        UserType = u.UserType,
+                        CreatedBy = u.CreatedBy,
+                        CreatedOn = u.CreatedOn,
+                        ModifiedBy = u.ModifiedBy,
+                        ModifiedOn = u.ModifiedOn
+                    }
                 ).FirstOrDefault();
 
                 if (user != null)
@@ -136,7 +164,7 @@ namespace Karent.DataAccess.ORM
                 _db.SaveChanges();
                 dbTran.Commit();
 
-                response.Data = VMUser.FromDataModel(newUser);
+                response.Data = GetById(newUser.Id).Data;
                 response.Message = $"{HttpStatusCode.Created} - User data successfully inserted";
                 response.StatusCode = HttpStatusCode.Created;
             }
@@ -203,7 +231,7 @@ namespace Karent.DataAccess.ORM
                 _db.SaveChanges();
                 dbTran.Commit();
 
-                response.Data = VMUser.FromDataModel(userToUpdate);
+                response.Data = GetById(userToUpdate.Id).Data;
                 response.Message = $"{HttpStatusCode.OK} - User data successfully updated";
                 response.StatusCode = HttpStatusCode.OK;
             }
@@ -291,7 +319,21 @@ namespace Karent.DataAccess.ORM
                 }
 
                 // Jika login berhasil
-                response.Data = VMUser.FromDataModel(user);
+                response.Data = new VMUser
+                {
+                    Id = user.Id,
+                    Name = user.Name,
+                    Email = user.Email,
+                    Address = user.Address,
+                    PhoneNumber = user.PhoneNumber,
+                    DrivingLicenseNumber = user.DrivingLicenseNumber,
+                    //Hide password Tambah TOKEN
+                    UserType = user.UserType,
+                    CreatedBy = user.CreatedBy,
+                    CreatedOn = user.CreatedOn,
+                    ModifiedBy = user.ModifiedBy,
+                    ModifiedOn = user.ModifiedOn
+                };
                 response.Message = "Login successful.";
                 response.StatusCode = HttpStatusCode.OK;
             }

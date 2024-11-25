@@ -22,32 +22,26 @@ namespace Karent.DataAccess.NativeQuery
             try
             {
                 var sql = @"
-                    SELECT r.*,
-                           u.name AS name,
-                           c.brand AS brand, c.model AS model
+                    SELECT r.id AS Id,
+                           r.user_id AS UserId,
+                           r.car_id AS CarId,
+                           r.start_date AS StartDate,
+                           r.end_date AS EndDate,
+                           r.total_fee AS TotalFee,
+                           r.created_by AS CreatedBy,
+                           r.created_on AS CreatedOn,
+                           r.modified_by AS ModifiedBy,
+                           r.modified_on AS ModifiedOn,
+                           u.name AS UserName,
+                           c.brand AS CarBrand, 
+                           c.model AS CarModel
                     FROM rentals r
                     JOIN users u ON r.user_id = u.id
                     JOIN cars c ON r.car_id = c.id
                     WHERE c.brand LIKE @p0 OR c.model LIKE @p0 OR u.name LIKE @p0";
 
-                var rentals = _db.Rentals
+                var rentals = _db.VMRentals
                     .FromSqlRaw(sql, $"%{filter}%")
-                    .Select(r => new VMRental
-                    {
-                        Id = r.Id,
-                        UserId = r.UserId,
-                        UserName = r.User.Name,
-                        CarId = r.CarId,
-                        CarBrand = r.Car.Brand,
-                        CarModel = r.Car.Model,
-                        StartDate = r.StartDate,
-                        EndDate = r.EndDate,
-                        TotalFee = r.TotalFee,
-                        CreatedBy = r.CreatedBy,
-                        CreatedOn = r.CreatedOn,
-                        ModifiedBy = r.ModifiedBy,
-                        ModifiedOn = r.ModifiedOn
-                    })
                     .ToList();
 
                 if (rentals.Any())
@@ -85,32 +79,26 @@ namespace Karent.DataAccess.NativeQuery
             try
             {
                 var sql = @"
-                        SELECT r.*,
-                           u.name AS name,
-                           c.brand AS brand, c.model AS model
+                    SELECT r.id AS Id,
+                           r.user_id AS UserId,
+                           r.car_id AS CarId,
+                           r.start_date AS StartDate,
+                           r.end_date AS EndDate,
+                           r.total_fee AS TotalFee,
+                           r.created_by AS CreatedBy,
+                           r.created_on AS CreatedOn,
+                           r.modified_by AS ModifiedBy,
+                           r.modified_on AS ModifiedOn,
+                           u.name AS UserName,
+                           c.brand AS CarBrand, 
+                           c.model AS CarModel
                         FROM rentals r
                         JOIN users u ON r.user_id = u.id
                         JOIN cars c ON r.car_id = c.id
                         WHERE r.id = @p0";
 
-                var rental = _db.Rentals
+                var rental = _db.VMRentals
                     .FromSqlRaw(sql, id)
-                    .Select(r => new VMRental
-                    {
-                        Id = r.Id,
-                        UserId = r.UserId,
-                        UserName = r.User.Name,
-                        CarId = r.CarId,
-                        CarBrand = r.Car.Brand,
-                        CarModel = r.Car.Model,
-                        StartDate = r.StartDate,
-                        EndDate = r.EndDate,
-                        TotalFee = r.TotalFee,
-                        CreatedBy = r.CreatedBy,
-                        CreatedOn = r.CreatedOn,
-                        ModifiedBy = r.ModifiedBy,
-                        ModifiedOn = r.ModifiedOn
-                    })
                     .FirstOrDefault();
 
                 if (rental != null)
@@ -203,7 +191,7 @@ namespace Karent.DataAccess.NativeQuery
             using var dbTran = _db.Database.BeginTransaction();
             try
             {
-                var sqlGetRental = "SELECT COUNT(1) as Id FROM rentals WHERE id = @p0";
+                var sqlGetRental = "SELECT COUNT(1) AS id FROM rentals WHERE id = @p0";
 
                 var existsCount = _db.Rentals
                     .FromSqlRaw(sqlGetRental, model.Id)
@@ -268,7 +256,7 @@ namespace Karent.DataAccess.NativeQuery
             using var dbTran = _db.Database.BeginTransaction();
             try
             {
-                var sqlGetRental = "SELECT COUNT(1) as Id FROM rentals WHERE id = @p0";
+                var sqlGetRental = "SELECT COUNT(1) AS id FROM rentals WHERE id = @p0";
 
                 var existsCount = _db.Rentals
                     .FromSqlRaw(sqlGetRental, id)
@@ -282,7 +270,7 @@ namespace Karent.DataAccess.NativeQuery
                     return response;
                 }
 
-                var sqlCheckInUse = "SELECT COUNT(1) as Id FROM rental_returns WHERE rental_id = @p0";
+                var sqlCheckInUse = "SELECT COUNT(1) AS id FROM rental_returns WHERE rental_id = @p0";
 
                 var inUseCount = _db.RentalReturns
                     .FromSqlRaw(sqlCheckInUse, id)

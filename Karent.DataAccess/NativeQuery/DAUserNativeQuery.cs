@@ -23,12 +23,22 @@ namespace Karent.DataAccess.NativeQuery
             try
             {
                 var sql = @"
-                        SELECT * FROM users
-                        WHERE name LIKE @p0 OR email LIKE @p0";
+                        SELECT u.id AS Id,
+                            u.name AS Name,
+                            u.email AS Email,
+                            u.address AS Address,
+                            u.phone_number AS PhoneNumber,
+                            u.driving_license_number AS DrivingLicenseNumber,
+                            u.user_type AS UserType,
+                            u.created_by AS CreatedBy,
+                            u.created_on AS CreatedOn,
+                            u.modified_by AS ModifiedBy,
+                            u.modified_on AS ModifiedOn
+                        FROM users as u
+                        WHERE u.name LIKE @p0 OR u.email LIKE @p0";
 
-                var users = _db.Users
+                var users = _db.VMUsers
                     .FromSqlRaw(sql, $"%{filter}%")
-                    .Select(u => VMUser.FromDataModel(u))
                     .ToList();
 
                 if (users.Any())
@@ -65,11 +75,23 @@ namespace Karent.DataAccess.NativeQuery
 
             try
             {
-                var sql = "SELECT * FROM users WHERE id = @p0";
+                var sql = @"
+                        SELECT u.id AS Id,
+                            u.name AS Name,
+                            u.email AS Email,
+                            u.address AS Address,
+                            u.phone_number AS PhoneNumber,
+                            u.driving_license_number AS DrivingLicenseNumber,
+                            u.user_type AS UserType,
+                            u.created_by AS CreatedBy,
+                            u.created_on AS CreatedOn,
+                            u.modified_by AS ModifiedBy,
+                            u.modified_on AS ModifiedOn
+                        FROM users as u 
+                        WHERE u.id = @p0";
 
-                var user = _db.Users
+                var user = _db.VMUsers
                     .FromSqlRaw(sql, id)
-                    .Select(u => VMUser.FromDataModel(u))
                     .FirstOrDefault();
 
                 if (user != null)
@@ -108,7 +130,7 @@ namespace Karent.DataAccess.NativeQuery
             try
             {
                 var sqlDuplicateCheck = @"
-                        SELECT COUNT(1) as Id FROM users
+                        SELECT COUNT(1) AS id FROM users
                         WHERE LOWER(email) = @p0 AND phone_number = @p1 AND driving_license_number = @p2";
 
                 var duplicateCount = _db.Users
@@ -125,29 +147,31 @@ namespace Karent.DataAccess.NativeQuery
 
                 var insertSql = @"
                         INSERT INTO users (name, email, address, phone_number, driving_license_number, password, user_type, created_by, created_on)
-                        VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8);
-                        SELECT CAST(SCOPE_IDENTITY() as int) AS Id;";
+                        OUTPUT INSERTED.*
+                        VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8);";
 
-                var newId = _db.Database.ExecuteSqlRaw(insertSql,
-                    model.Name,
-                    model.Email,
-                    model.Address ?? (object)DBNull.Value,
-                    model.PhoneNumber ?? (object)DBNull.Value,
-                    model.DrivingLicenseNumber ?? (object)DBNull.Value,
-                    PasswordHasher.HashPassword(model.Password),
-                    model.UserType,
-                    model.CreatedBy ?? (object)DBNull.Value,
-                    DateTime.Now);
+                var insertedUser = _db.Users
+                    .FromSqlRaw(insertSql,
+                        model.Name,
+                        model.Email,
+                        model.Address ?? (object)DBNull.Value,
+                        model.PhoneNumber ?? (object)DBNull.Value,
+                        model.DrivingLicenseNumber ?? (object)DBNull.Value,
+                        PasswordHasher.HashPassword(model.Password),
+                        model.UserType,
+                        model.CreatedBy ?? (object)DBNull.Value,
+                        DateTime.Now)
+                    .AsEnumerable()
+                    .FirstOrDefault();
 
-                if (newId == 0)
+                if (insertedUser == null)
                 {
                     response.Message = $"{HttpStatusCode.InternalServerError} - Failed to insert User";
                     response.StatusCode = HttpStatusCode.InternalServerError;
                     return response;
                 }
 
-                model.Id = newId;
-                response.Data = model;
+                response.Data = GetById(insertedUser.Id).Data;
                 response.Message = $"{HttpStatusCode.Created} - User data successfully inserted";
                 response.StatusCode = HttpStatusCode.Created;
 
@@ -177,7 +201,7 @@ namespace Karent.DataAccess.NativeQuery
             using var dbTran = _db.Database.BeginTransaction();
             try
             {
-                var sqlGetUser = "SELECT COUNT(1) as Id FROM users WHERE id = @p0";
+                var sqlGetUser = "SELECT COUNT(1) AS id FROM users WHERE id = @p0";
 
                 var existsCount = _db.Users
                     .FromSqlRaw(sqlGetUser, model.Id)
@@ -192,7 +216,7 @@ namespace Karent.DataAccess.NativeQuery
                 }
 
                 var sqlDuplicateCheck = @"
-                        SELECT COUNT(1) as Id FROM users
+                        SELECT COUNT(1) AS id FROM users
                         WHERE id != @p0 AND LOWER(email) = @p1 AND phone_number = @p2 AND driving_license_number = @p3";
 
                 var duplicateCount = _db.Users
@@ -260,7 +284,7 @@ namespace Karent.DataAccess.NativeQuery
             using var dbTran = _db.Database.BeginTransaction();
             try
             {
-                var sqlGetUser = "SELECT COUNT(1) as Id FROM users WHERE id = @p0";
+                var sqlGetUser = "SELECT COUNT(1) AS id FROM users WHERE id = @p0";
 
                 var existsCount = _db.Users
                     .FromSqlRaw(sqlGetUser, id)
@@ -274,7 +298,7 @@ namespace Karent.DataAccess.NativeQuery
                     return response;
                 }
 
-                var sqlCheckInUse = "SELECT COUNT(1) as Id FROM rentals WHERE user_id = @p0";
+                var sqlCheckInUse = "SELECT COUNT(1) AS id FROM rentals WHERE user_id = @p0";
 
                 var inUseCount = _db.Rentals
                     .FromSqlRaw(sqlCheckInUse, id)
@@ -334,7 +358,21 @@ namespace Karent.DataAccess.NativeQuery
                     return response;
                 }
 
-                response.Data = VMUser.FromDataModel(user);
+                response.Data = new VMUser
+                {
+                    Id = user.Id,
+                    Name = user.Name,
+                    Email = user.Email,
+                    Address = user.Address,
+                    PhoneNumber = user.PhoneNumber,
+                    DrivingLicenseNumber = user.DrivingLicenseNumber,
+                    //Hide password
+                    UserType = user.UserType,
+                    CreatedBy = user.CreatedBy,
+                    CreatedOn = user.CreatedOn,
+                    ModifiedBy = user.ModifiedBy,
+                    ModifiedOn = user.ModifiedOn
+                };
                 response.Message = "Login successful.";
                 response.StatusCode = HttpStatusCode.OK;
             }

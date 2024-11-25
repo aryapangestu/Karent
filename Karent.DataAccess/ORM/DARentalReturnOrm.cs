@@ -26,12 +26,27 @@ namespace Karent.DataAccess.ORM
                     join u in _db.Users on r.UserId equals u.Id
                     join c in _db.Cars on r.CarId equals c.Id
                     where
-
-                            c.Brand.Contains(filter)
-                            || c.Model.Contains(filter)
-                            || u.Name.Contains(filter)
-
-                    select VMRentalReturn.FromDataModel(rr, r, u, c)
+                        c.Brand.Contains(filter)
+                        || c.Model.Contains(filter)
+                        || u.Name.Contains(filter)
+                    select new VMRentalReturn
+                    {
+                        Id = rr.Id,
+                        RentalId = rr.RentalId,
+                        UserName = u.Name,
+                        CarBrand = c.Brand,
+                        CarModel = c.Model,
+                        ReturnDate = rr.ReturnDate,
+                        LateFee = rr.LateFee,
+                        TotalFee = rr.TotalFee,
+                        RentalStartDate = r.StartDate,
+                        RentalEndDate = r.EndDate,
+                        RentalTotalFee = r.TotalFee,
+                        CreatedBy = rr.CreatedBy,
+                        CreatedOn = rr.CreatedOn,
+                        ModifiedBy = rr.ModifiedBy,
+                        ModifiedOn = rr.ModifiedOn
+                    }
                 ).ToList();
 
                 if (rentalReturns.Count > 0)
@@ -75,7 +90,24 @@ namespace Karent.DataAccess.ORM
                     join u in _db.Users on r.UserId equals u.Id
                     join c in _db.Cars on r.CarId equals c.Id
                     where rr.Id == id
-                    select VMRentalReturn.FromDataModel(rr, r, u, c)
+                    select new VMRentalReturn
+                    {
+                        Id = rr.Id,
+                        RentalId = rr.RentalId,
+                        UserName = u.Name,
+                        CarBrand = c.Brand,
+                        CarModel = c.Model,
+                        ReturnDate = rr.ReturnDate,
+                        LateFee = rr.LateFee,
+                        TotalFee = rr.TotalFee,
+                        RentalStartDate = r.StartDate,
+                        RentalEndDate = r.EndDate,
+                        RentalTotalFee = r.TotalFee,
+                        CreatedBy = rr.CreatedBy,
+                        CreatedOn = rr.CreatedOn,
+                        ModifiedBy = rr.ModifiedBy,
+                        ModifiedOn = rr.ModifiedOn
+                    }
                 ).FirstOrDefault();
 
                 if (rentalReturn != null)

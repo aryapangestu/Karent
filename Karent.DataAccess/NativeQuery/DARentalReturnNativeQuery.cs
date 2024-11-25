@@ -22,16 +22,30 @@ namespace Karent.DataAccess.NativeQuery
             try
             {
                 var sql = @"
-                        SELECT rr.*, r.*, u.*, c.*
+                        SELECT 
+                            rr.id AS Id,
+                            rr.rental_id AS RentalId,
+                            u.name AS UserName,
+                            c.brand AS CarBrand,
+                            c.model AS CarModel,
+                            rr.return_date AS ReturnDate,
+                            rr.late_fee AS LateFee,
+                            rr.total_fee AS TotalFee,
+                            r.start_date AS RentalStartDate,
+                            r.end_date AS RentalEndDate,
+                            r.total_fee AS RentalTotalFee,
+                            rr.created_by AS CreatedBy,
+                            rr.created_on AS CreatedOn,
+                            rr.modified_by AS ModifiedBy,
+                            rr.modified_on AS ModifiedOn
                         FROM rental_returns rr
                         JOIN rentals r ON rr.rental_id = r.id
                         JOIN users u ON r.user_id = u.id
                         JOIN cars c ON r.car_id = c.id
                         WHERE c.brand LIKE @p0 OR c.model LIKE @p0 OR u.name LIKE @p0";
 
-                var rentalReturns = _db.RentalReturns
+                var rentalReturns = _db.VMRentalReturns
                     .FromSqlRaw(sql, $"%{filter}%")
-                    .Select(rr => VMRentalReturn.FromDataModel(rr, rr.Rental, rr.Rental.User, rr.Rental.Car))
                     .ToList();
 
                 if (rentalReturns.Any())
@@ -69,16 +83,30 @@ namespace Karent.DataAccess.NativeQuery
             try
             {
                 var sql = @"
-                        SELECT rr.*, r.*, u.*, c.*
+                        SELECT 
+                            rr.id AS Id,
+                            rr.rental_id AS RentalId,
+                            u.name AS UserName,
+                            c.brand AS CarBrand,
+                            c.model AS CarModel,
+                            rr.return_date AS ReturnDate,
+                            rr.late_fee AS LateFee,
+                            rr.total_fee AS TotalFee,
+                            r.start_date AS RentalStartDate,
+                            r.end_date AS RentalEndDate,
+                            r.total_fee AS RentalTotalFee,
+                            rr.created_by AS CreatedBy,
+                            rr.created_on AS CreatedOn,
+                            rr.modified_by AS ModifiedBy,
+                            rr.modified_on AS ModifiedOn
                         FROM rental_returns rr
                         JOIN rentals r ON rr.rental_id = r.id
                         JOIN users u ON r.user_id = u.id
                         JOIN cars c ON r.car_id = c.id
                         WHERE rr.id = @p0";
 
-                var rentalReturn = _db.RentalReturns
+                var rentalReturn = _db.VMRentalReturns
                     .FromSqlRaw(sql, id)
-                    .Select(rr => VMRentalReturn.FromDataModel(rr, rr.Rental, rr.Rental.User, rr.Rental.Car))
                     .FirstOrDefault();
 
                 if (rentalReturn != null)
@@ -118,26 +146,28 @@ namespace Karent.DataAccess.NativeQuery
             {
                 var insertSql = @"
                         INSERT INTO rental_returns (rental_id, return_date, late_fee, total_fee, created_by, created_on)
-                        VALUES (@p0, @p1, @p2, @p3, @p4, @p5);
-                        SELECT CAST(SCOPE_IDENTITY() as int) AS Id;";
+                        OUTPUT INSERTED.*
+                        VALUES (@p0, @p1, @p2, @p3, @p4, @p5);";
 
-                var newId = _db.Database.ExecuteSqlRaw(insertSql,
-                    model.RentalId,
-                    model.ReturnDate,
-                    model.LateFee,
-                    model.TotalFee,
-                    model.CreatedBy ?? (object)DBNull.Value,
-                    DateTime.Now);
+                var insertedRentalReturn = _db.RentalReturns
+                    .FromSqlRaw(insertSql,
+                        model.RentalId,
+                        model.ReturnDate,
+                        model.LateFee,
+                        model.TotalFee,
+                        model.CreatedBy ?? (object)DBNull.Value,
+                        DateTime.Now)
+                    .AsEnumerable()
+                    .FirstOrDefault();
 
-                if (newId == 0)
+                if (insertedRentalReturn == null)
                 {
                     response.Message = $"{HttpStatusCode.InternalServerError} - Failed to insert Rental Return";
                     response.StatusCode = HttpStatusCode.InternalServerError;
                     return response;
                 }
 
-                model.Id = newId;
-                response.Data = model;
+                response.Data = GetById(insertedRentalReturn.Id).Data;
                 response.Message = $"{HttpStatusCode.Created} - Rental Return data successfully inserted";
                 response.StatusCode = HttpStatusCode.Created;
 
@@ -167,7 +197,7 @@ namespace Karent.DataAccess.NativeQuery
             using var dbTran = _db.Database.BeginTransaction();
             try
             {
-                var sqlGetRentalReturn = "SELECT COUNT(1) as Id FROM rental_returns WHERE id = @p0";
+                var sqlGetRentalReturn = "SELECT COUNT(1) AS id FROM rental_returns WHERE id = @p0";
 
                 var existsCount = _db.RentalReturns
                     .FromSqlRaw(sqlGetRentalReturn, model.Id)
@@ -200,7 +230,7 @@ namespace Karent.DataAccess.NativeQuery
                     model.ModifiedBy ?? (object)DBNull.Value,
                     DateTime.Now);
 
-                response.Data = model;
+                response.Data = GetById(model.Id).Data; ;
                 response.Message = $"{HttpStatusCode.OK} - Rental Return data successfully updated";
                 response.StatusCode = HttpStatusCode.OK;
 
@@ -230,7 +260,7 @@ namespace Karent.DataAccess.NativeQuery
             using var dbTran = _db.Database.BeginTransaction();
             try
             {
-                var sqlGetRentalReturn = "SELECT COUNT(1) as Id FROM rental_returns WHERE id = @p0";
+                var sqlGetRentalReturn = "SELECT COUNT(1) AS id FROM rental_returns WHERE id = @p0";
 
                 var existsCount = _db.RentalReturns
                     .FromSqlRaw(sqlGetRentalReturn, id)

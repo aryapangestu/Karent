@@ -25,7 +25,22 @@ namespace Karent.DataAccess.ORM
                     join u in _db.Users on r.UserId equals u.Id
                     join c in _db.Cars on r.CarId equals c.Id
                     where c.Brand.Contains(filter) || c.Model.Contains(filter) || u.Name.Contains(filter)
-                    select VMRental.FromDataModel(r, u, c)
+                    select new VMRental
+                    {
+                        Id = r.Id,
+                        UserId = r.UserId,
+                        UserName = u.Name,
+                        CarId = r.CarId,
+                        CarBrand = c.Brand,
+                        CarModel = c.Model,
+                        StartDate = r.StartDate,
+                        EndDate = r.EndDate,
+                        TotalFee = r.TotalFee,
+                        CreatedBy = r.CreatedBy,
+                        CreatedOn = r.CreatedOn,
+                        ModifiedBy = r.ModifiedBy,
+                        ModifiedOn = r.ModifiedOn
+                    }
                 ).ToList();
 
                 if (rentals.Count > 0)
@@ -68,7 +83,22 @@ namespace Karent.DataAccess.ORM
                     join u in _db.Users on r.UserId equals u.Id
                     join c in _db.Cars on r.CarId equals c.Id
                     where r.Id == id
-                    select VMRental.FromDataModel(r, u, c)
+                    select new VMRental
+                    {
+                        Id = r.Id,
+                        UserId = r.UserId,
+                        UserName = u.Name,
+                        CarId = r.CarId,
+                        CarBrand = c.Brand,
+                        CarModel = c.Model,
+                        StartDate = r.StartDate,
+                        EndDate = r.EndDate,
+                        TotalFee = r.TotalFee,
+                        CreatedBy = r.CreatedBy,
+                        CreatedOn = r.CreatedOn,
+                        ModifiedBy = r.ModifiedBy,
+                        ModifiedOn = r.ModifiedOn
+                    }
                 ).FirstOrDefault();
 
                 if (rental != null)

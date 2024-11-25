@@ -1,6 +1,4 @@
-﻿using Karent.DataModel;
-
-namespace Karent.ViewModel
+﻿namespace Karent.ViewModel
 {
     public class VMCar
     {
@@ -16,25 +14,6 @@ namespace Karent.ViewModel
         public DateTime? CreatedOn { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedOn { get; set; }
-
-        public static VMCar FromDataModel(Car car)
-        {
-            return new VMCar
-            {
-                Id = car.Id,
-                Brand = car.Brand,
-                Model = car.Model,
-                Year = car.Year,
-                PlateNumber = car.PlateNumber,
-                RentalRatePerDay = car.RentalRatePerDay,
-                LateRatePerDay = car.LateRatePerDay,
-                Status = car.Status,
-                CreatedBy = car.CreatedBy,
-                CreatedOn = car.CreatedOn,
-                ModifiedBy = car.ModifiedBy,
-                ModifiedOn = car.ModifiedOn
-            };
-        }
 
         // Metode validasi
         public bool IsValid(out string validationMessage)

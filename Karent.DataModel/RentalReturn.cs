@@ -12,6 +12,8 @@
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedOn { get; set; }
 
+        public virtual Car Car { get; set; } = null!;
+        public virtual User User { get; set; } = null!;
         public virtual Rental Rental { get; set; } = null!;
     }
 }

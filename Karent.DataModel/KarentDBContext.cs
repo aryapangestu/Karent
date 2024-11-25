@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Karent.ViewModel;
+using Microsoft.EntityFrameworkCore;
 
 namespace Karent.DataModel
 {
@@ -18,8 +19,33 @@ namespace Karent.DataModel
         public virtual DbSet<RentalReturn> RentalReturns { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
 
+        public virtual DbSet<VMCar> VMCars { get; set; }
+        public virtual DbSet<VMRental> VMRentals { get; set; }
+        public virtual DbSet<VMRentalReturn> VMRentalReturns { get; set; }
+        public virtual DbSet<VMUser> VMUsers { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<VMCar>(entity =>
+            {
+                entity.HasNoKey();
+            });
+
+            modelBuilder.Entity<VMRental>(entity =>
+            {
+                entity.HasNoKey();
+            });
+
+            modelBuilder.Entity<VMRentalReturn>(entity =>
+            {
+                entity.HasNoKey();
+            });
+
+            modelBuilder.Entity<VMUser>(entity =>
+            {
+                entity.HasNoKey();
+            });
+
             modelBuilder.Entity<Car>(entity =>
             {
                 entity.ToTable("cars");

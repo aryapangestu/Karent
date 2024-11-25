@@ -1,4 +1,4 @@
-﻿using Karent.DataModel;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.RegularExpressions;
 
 namespace Karent.ViewModel
@@ -11,31 +11,13 @@ namespace Karent.ViewModel
         public string? Address { get; set; }
         public string? PhoneNumber { get; set; }
         public string? DrivingLicenseNumber { get; set; }
+        [NotMapped]
         public string Password { get; set; } = null!;
         public string UserType { get; set; } = null!;
         public int? CreatedBy { get; set; }
         public DateTime? CreatedOn { get; set; }
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedOn { get; set; }
-
-        public static VMUser FromDataModel(User user)
-        {
-            return new VMUser
-            {
-                Id = user.Id,
-                Name = user.Name,
-                Email = user.Email,
-                Address = user.Address,
-                PhoneNumber = user.PhoneNumber,
-                DrivingLicenseNumber = user.DrivingLicenseNumber,
-                //Hide password
-                UserType = user.UserType,
-                CreatedBy = user.CreatedBy,
-                CreatedOn = user.CreatedOn,
-                ModifiedBy = user.ModifiedBy,
-                ModifiedOn = user.ModifiedOn
-            };
-        }
 
         public bool IsValid(out string validationMessage)
         {
