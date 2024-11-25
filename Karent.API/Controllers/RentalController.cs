@@ -2,6 +2,7 @@
 using Karent.DataAccess.NativeQuery;
 using Karent.DataModel;
 using Karent.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -21,6 +22,7 @@ namespace Karent.API.Controllers
             _logger = logger;
         }
 
+        [Authorize(Roles = "admin")]
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {
@@ -45,6 +47,7 @@ namespace Karent.API.Controllers
             }
         }
 
+        [Authorize(Roles = "admin")]
         [HttpGet("filter/{filter}")]
         public async Task<ActionResult> GetByFilter(string filter)
         {
@@ -69,6 +72,7 @@ namespace Karent.API.Controllers
             }
         }
 
+        [Authorize(Roles = "admin")]
         [HttpGet("{id}")]
         public async Task<ActionResult> GetById(int id)
         {
@@ -93,6 +97,7 @@ namespace Karent.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult> Create(VMRental model)
         {
@@ -123,6 +128,7 @@ namespace Karent.API.Controllers
             }
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPut]
         public async Task<ActionResult> Update(VMRental model)
         {
@@ -154,6 +160,7 @@ namespace Karent.API.Controllers
             }
         }
 
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {

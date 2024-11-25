@@ -1,8 +1,11 @@
-﻿using Karent.DataAccess.Interfaces;
+﻿using Karent.API.Helpers;
+using Karent.DataAccess.Interfaces;
 using Karent.DataAccess.NativeQuery;
 using Karent.DataModel;
 using Karent.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 
 namespace Karent.API.Controllers
@@ -12,16 +15,20 @@ namespace Karent.API.Controllers
     public class UserController : ControllerBase
     {
         private IDAUser _userService;
+        private JwtHelper _jwtHelper;
         private readonly ILogger<UserController> _logger;
 
-        public UserController(KarentDBContext db, ILogger<UserController> logger)
+        public UserController(KarentDBContext db, JwtHelper jwtHelper, ILogger<UserController> logger)
         {
             //_userService = new DAUserOrm(db);
             _userService = new DAUserNativeQuery(db);
+
+            _jwtHelper = jwtHelper;
             _logger = logger;
 
         }
 
+        [Authorize(Roles = "admin")]
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {
@@ -46,6 +53,7 @@ namespace Karent.API.Controllers
             }
         }
 
+        [Authorize(Roles = "admin")]
         [HttpGet("filter/{filter}")]
         public async Task<ActionResult> GetByFilter(string filter)
         {
@@ -70,6 +78,7 @@ namespace Karent.API.Controllers
             }
         }
 
+        [Authorize(Roles = "admin")]
         [HttpGet("{id}")]
         public async Task<ActionResult> GetById(int id)
         {
@@ -94,6 +103,7 @@ namespace Karent.API.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<ActionResult> Login(VMLogin model)
         {
@@ -109,7 +119,8 @@ namespace Karent.API.Controllers
 
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    return Ok(response);
+                    var token = _jwtHelper.GenerateToken(response.Data);
+                    return Ok(token);
                 }
                 else
                 {
@@ -124,6 +135,7 @@ namespace Karent.API.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<ActionResult> Create(VMUser model)
         {
@@ -161,6 +173,7 @@ namespace Karent.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut]
         public async Task<ActionResult> Update(VMUser model)
         {
@@ -198,6 +211,7 @@ namespace Karent.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
