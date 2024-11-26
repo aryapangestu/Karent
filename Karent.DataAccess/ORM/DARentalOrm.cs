@@ -64,6 +64,56 @@ namespace Karent.DataAccess.ORM
             return response;
         }
 
+        public VMResponse<List<VMRental>> GetByFilter(string filter, int userId)
+        {
+            VMResponse<List<VMRental>> response = new VMResponse<List<VMRental>>();
+
+            try
+            {
+                var rentals = (
+                    from r in _db.Rentals
+                    join u in _db.Users on r.UserId equals u.Id
+                    join c in _db.Cars on r.CarId equals c.Id
+                    where (c.Brand.Contains(filter) || c.Model.Contains(filter) || u.Name.Contains(filter))
+                          && r.UserId == userId
+                    select new VMRental
+                    {
+                        Id = r.Id,
+                        UserId = r.UserId,
+                        UserName = u.Name,
+                        CarId = r.CarId,
+                        CarBrand = c.Brand,
+                        CarModel = c.Model,
+                        StartDate = r.StartDate,
+                        EndDate = r.EndDate,
+                        TotalFee = r.TotalFee,
+                        CreatedBy = r.CreatedBy,
+                        CreatedOn = r.CreatedOn,
+                        ModifiedBy = r.ModifiedBy,
+                        ModifiedOn = r.ModifiedOn
+                    }
+                ).ToList();
+
+                if (rentals.Count > 0)
+                {
+                    response.Data = rentals;
+                    response.Message = $"{HttpStatusCode.OK} - {rentals.Count} Rental(s) successfully fetched";
+                    response.StatusCode = HttpStatusCode.OK;
+                }
+                else
+                {
+                    response.Message = $"{HttpStatusCode.NoContent} - No Rental found";
+                    response.StatusCode = HttpStatusCode.NoContent;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+            }
+
+            return response;
+        }
+
         public VMResponse<VMRental> GetById(int id)
         {
             VMResponse<VMRental> response = new VMResponse<VMRental>();
@@ -83,6 +133,63 @@ namespace Karent.DataAccess.ORM
                     join u in _db.Users on r.UserId equals u.Id
                     join c in _db.Cars on r.CarId equals c.Id
                     where r.Id == id
+                    select new VMRental
+                    {
+                        Id = r.Id,
+                        UserId = r.UserId,
+                        UserName = u.Name,
+                        CarId = r.CarId,
+                        CarBrand = c.Brand,
+                        CarModel = c.Model,
+                        StartDate = r.StartDate,
+                        EndDate = r.EndDate,
+                        TotalFee = r.TotalFee,
+                        CreatedBy = r.CreatedBy,
+                        CreatedOn = r.CreatedOn,
+                        ModifiedBy = r.ModifiedBy,
+                        ModifiedOn = r.ModifiedOn
+                    }
+                ).FirstOrDefault();
+
+                if (rental != null)
+                {
+                    response.Data = rental;
+                    response.Message = $"{HttpStatusCode.OK} - Rental data successfully fetched";
+                    response.StatusCode = HttpStatusCode.OK;
+                }
+                else
+                {
+                    response.Message = $"{HttpStatusCode.NoContent} - Rental not found";
+                    response.StatusCode = HttpStatusCode.NoContent;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+            }
+
+            return response;
+        }
+
+        public VMResponse<VMRental> GetById(int id, int userId)
+        {
+            VMResponse<VMRental> response = new VMResponse<VMRental>();
+
+            // Validasi awal untuk ID
+            if (id <= 0)
+            {
+                response.Message = $"{HttpStatusCode.BadRequest} - Invalid Rental ID";
+                response.StatusCode = HttpStatusCode.BadRequest;
+                return response;
+            }
+
+            try
+            {
+                var rental = (
+                    from r in _db.Rentals
+                    join u in _db.Users on r.UserId equals u.Id
+                    join c in _db.Cars on r.CarId equals c.Id
+                    where r.Id == id && r.UserId == userId
                     select new VMRental
                     {
                         Id = r.Id,

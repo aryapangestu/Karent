@@ -70,6 +70,60 @@ namespace Karent.DataAccess.ORM
             return response;
         }
 
+        public VMResponse<List<VMRentalReturn>> GetByFilter(string filter, int userId)
+        {
+            var response = new VMResponse<List<VMRentalReturn>>();
+
+            try
+            {
+                var rentalReturns = (
+                    from rr in _db.RentalReturns
+                    join r in _db.Rentals on rr.RentalId equals r.Id
+                    join u in _db.Users on r.UserId equals u.Id
+                    join c in _db.Cars on r.CarId equals c.Id
+                    where (c.Brand.Contains(filter) || c.Model.Contains(filter) || u.Name.Contains(filter))
+                          && r.UserId == userId
+                    select new VMRentalReturn
+                    {
+                        Id = rr.Id,
+                        RentalId = rr.RentalId,
+                        UserName = u.Name,
+                        CarBrand = c.Brand,
+                        CarModel = c.Model,
+                        ReturnDate = rr.ReturnDate,
+                        LateFee = rr.LateFee,
+                        TotalFee = rr.TotalFee,
+                        RentalStartDate = r.StartDate,
+                        RentalEndDate = r.EndDate,
+                        RentalTotalFee = r.TotalFee,
+                        CreatedBy = rr.CreatedBy,
+                        CreatedOn = rr.CreatedOn,
+                        ModifiedBy = rr.ModifiedBy,
+                        ModifiedOn = rr.ModifiedOn
+                    }
+                ).ToList();
+
+                if (rentalReturns.Count > 0)
+                {
+                    response.Data = rentalReturns;
+                    response.Message = $"{HttpStatusCode.OK} - {rentalReturns.Count} Rental Return(s) successfully fetched";
+                    response.StatusCode = HttpStatusCode.OK;
+                }
+                else
+                {
+                    response.Message = $"{HttpStatusCode.NoContent} - No Rental Return found";
+                    response.StatusCode = HttpStatusCode.NoContent;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+                response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+
+            return response;
+        }
+
         public VMResponse<VMRentalReturn> GetById(int id)
         {
             VMResponse<VMRentalReturn> response = new VMResponse<VMRentalReturn>();
@@ -126,6 +180,67 @@ namespace Karent.DataAccess.ORM
             catch (Exception ex)
             {
                 response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+            }
+
+            return response;
+        }
+
+        public VMResponse<VMRentalReturn> GetById(int id, int userId)
+        {
+            var response = new VMResponse<VMRentalReturn>();
+
+            // Validasi ID
+            if (id <= 0 || userId <= 0)
+            {
+                response.Message = $"{HttpStatusCode.BadRequest} - Invalid Rental Return ID or User ID";
+                response.StatusCode = HttpStatusCode.BadRequest;
+                return response;
+            }
+
+            try
+            {
+                var rentalReturn = (
+                    from rr in _db.RentalReturns
+                    join r in _db.Rentals on rr.RentalId equals r.Id
+                    join u in _db.Users on r.UserId equals u.Id
+                    join c in _db.Cars on r.CarId equals c.Id
+                    where rr.Id == id && r.UserId == userId
+                    select new VMRentalReturn
+                    {
+                        Id = rr.Id,
+                        RentalId = rr.RentalId,
+                        UserName = u.Name,
+                        CarBrand = c.Brand,
+                        CarModel = c.Model,
+                        ReturnDate = rr.ReturnDate,
+                        LateFee = rr.LateFee,
+                        TotalFee = rr.TotalFee,
+                        RentalStartDate = r.StartDate,
+                        RentalEndDate = r.EndDate,
+                        RentalTotalFee = r.TotalFee,
+                        CreatedBy = rr.CreatedBy,
+                        CreatedOn = rr.CreatedOn,
+                        ModifiedBy = rr.ModifiedBy,
+                        ModifiedOn = rr.ModifiedOn
+                    }
+                ).FirstOrDefault();
+
+                if (rentalReturn != null)
+                {
+                    response.Data = rentalReturn;
+                    response.Message = $"{HttpStatusCode.OK} - Rental Return data successfully fetched";
+                    response.StatusCode = HttpStatusCode.OK;
+                }
+                else
+                {
+                    response.Message = $"{HttpStatusCode.NoContent} - Rental Return not found";
+                    response.StatusCode = HttpStatusCode.NoContent;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+                response.StatusCode = HttpStatusCode.InternalServerError;
             }
 
             return response;

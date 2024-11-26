@@ -69,6 +69,61 @@ namespace Karent.DataAccess.NativeQuery
             return response;
         }
 
+        public VMResponse<List<VMRentalReturn>> GetByFilter(string filter, int userId)
+        {
+            var response = new VMResponse<List<VMRentalReturn>>();
+
+            try
+            {
+                var sql = @"
+                SELECT 
+                    rr.id AS Id,
+                    rr.rental_id AS RentalId,
+                    u.name AS UserName,
+                    c.brand AS CarBrand,
+                    c.model AS CarModel,
+                    rr.return_date AS ReturnDate,
+                    rr.late_fee AS LateFee,
+                    rr.total_fee AS TotalFee,
+                    r.start_date AS RentalStartDate,
+                    r.end_date AS RentalEndDate,
+                    r.total_fee AS RentalTotalFee,
+                    rr.created_by AS CreatedBy,
+                    rr.created_on AS CreatedOn,
+                    rr.modified_by AS ModifiedBy,
+                    rr.modified_on AS ModifiedOn
+                FROM rental_returns rr
+                JOIN rentals r ON rr.rental_id = r.id
+                JOIN users u ON r.user_id = u.id
+                JOIN cars c ON r.car_id = c.id
+                WHERE (c.brand LIKE @p0 OR c.model LIKE @p0 OR u.name LIKE @p0)
+                  AND r.user_id = @p1";
+
+                var rentalReturns = _db.VMRentalReturns
+                    .FromSqlRaw(sql, $"%{filter}%", userId)
+                    .ToList();
+
+                if (rentalReturns.Any())
+                {
+                    response.Data = rentalReturns;
+                    response.Message = $"{HttpStatusCode.OK} - {rentalReturns.Count} Rental Return data(s) successfully fetched";
+                    response.StatusCode = HttpStatusCode.OK;
+                }
+                else
+                {
+                    response.Message = $"{HttpStatusCode.NoContent} - No Rental Return found";
+                    response.StatusCode = HttpStatusCode.NoContent;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+                response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+
+            return response;
+        }
+
         public VMResponse<VMRentalReturn> GetById(int id)
         {
             var response = new VMResponse<VMRentalReturn>();
@@ -107,6 +162,67 @@ namespace Karent.DataAccess.NativeQuery
 
                 var rentalReturn = _db.VMRentalReturns
                     .FromSqlRaw(sql, id)
+                    .FirstOrDefault();
+
+                if (rentalReturn != null)
+                {
+                    response.Data = rentalReturn;
+                    response.Message = $"{HttpStatusCode.OK} - Rental Return data successfully fetched";
+                    response.StatusCode = HttpStatusCode.OK;
+                }
+                else
+                {
+                    response.Message = $"{HttpStatusCode.NoContent} - Rental Return not found";
+                    response.StatusCode = HttpStatusCode.NoContent;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Message = $"{HttpStatusCode.InternalServerError} - {ex.Message}";
+                response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+
+            return response;
+        }
+
+        public VMResponse<VMRentalReturn> GetById(int id, int userId)
+        {
+            var response = new VMResponse<VMRentalReturn>();
+
+            if (id <= 0 || userId <= 0)
+            {
+                response.Message = $"{HttpStatusCode.BadRequest} - Invalid Rental Return ID or User ID";
+                response.StatusCode = HttpStatusCode.BadRequest;
+                return response;
+            }
+
+            try
+            {
+                var sql = @"
+                SELECT 
+                    rr.id AS Id,
+                    rr.rental_id AS RentalId,
+                    u.name AS UserName,
+                    c.brand AS CarBrand,
+                    c.model AS CarModel,
+                    rr.return_date AS ReturnDate,
+                    rr.late_fee AS LateFee,
+                    rr.total_fee AS TotalFee,
+                    r.start_date AS RentalStartDate,
+                    r.end_date AS RentalEndDate,
+                    r.total_fee AS RentalTotalFee,
+                    rr.created_by AS CreatedBy,
+                    rr.created_on AS CreatedOn,
+                    rr.modified_by AS ModifiedBy,
+                    rr.modified_on AS ModifiedOn
+                FROM rental_returns rr
+                JOIN rentals r ON rr.rental_id = r.id
+                JOIN users u ON r.user_id = u.id
+                JOIN cars c ON r.car_id = c.id
+                WHERE rr.id = @p0 AND r.user_id = @p1";
+
+                var rentalReturn = _db.VMRentalReturns
+                    .FromSqlRaw(sql, id, userId)
                     .FirstOrDefault();
 
                 if (rentalReturn != null)
