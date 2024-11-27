@@ -10,6 +10,7 @@ namespace Karent.DataAccess.NativeQuery
     {
         private readonly KarentDBContext _db;
 
+        // Konstruktor untuk menginisialisasi konteks database
         public DARentalReturnNativeQuery(KarentDBContext db)
         {
             _db = db;

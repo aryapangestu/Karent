@@ -10,6 +10,7 @@ namespace Karent.DataAccess.ORM
     {
         private readonly KarentDBContext _db;
 
+        // Konstruktor untuk menginisialisasi konteks database
         public DAUserOrm(KarentDBContext db)
         {
             _db = db;

@@ -18,6 +18,7 @@ namespace Karent.API.Controllers
         private JwtHelper _jwtHelper;
         private readonly ILogger<UserController> _logger;
 
+        // Konstruktor untuk menginisialisasi layanan data akses dan logger
         public UserController(IDAUser userService, JwtHelper jwtHelper, ILogger<UserController> logger)
         {
             _userService = userService;

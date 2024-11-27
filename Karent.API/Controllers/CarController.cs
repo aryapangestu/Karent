@@ -15,6 +15,7 @@ namespace Karent.API.Controllers
         private IDACar _carService;
         private readonly ILogger<CarController> _logger;
 
+        // Konstruktor untuk menginisialisasi layanan data akses dan logger
         public CarController(IDACar carService, ILogger<CarController> logger)
         {
             _carService = carService;

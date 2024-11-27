@@ -16,6 +16,7 @@ namespace Karent.API.Controllers
         private readonly IDARentalReturn _rentalReturnService;
         private readonly ILogger<RentalReturnController> _logger;
 
+        // Konstruktor untuk menginisialisasi layanan data akses dan logger
         public RentalReturnController(IDARentalReturn rentalReturnService, ILogger<RentalReturnController> logger)
         {
             _rentalReturnService = rentalReturnService;
