@@ -16,9 +16,9 @@ namespace Karent.API.Controllers
         private readonly IDARentalReturn _rentalReturnService;
         private readonly ILogger<RentalReturnController> _logger;
 
-        public RentalReturnController(KarentDBContext db, ILogger<RentalReturnController> logger)
+        public RentalReturnController(IDARentalReturn rentalReturnService, ILogger<RentalReturnController> logger)
         {
-            _rentalReturnService = new DARentalReturnNativeQuery(db);
+            _rentalReturnService = rentalReturnService;
             _logger = logger;
         }
 

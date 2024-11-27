@@ -13,10 +13,10 @@ namespace Karent.API.Extensions
             services.AddScoped<IDARentalReturn, DARentalReturnOrm>();
             services.AddScoped<IDAUser, DAUserOrm>();
 
-            services.AddScoped<IDACar, DACarNativeQuery>();
-            services.AddScoped<IDARental, DARentalNativeQuery>();
-            services.AddScoped<IDARentalReturn, DARentalReturnNativeQuery>();
-            services.AddScoped<IDAUser, DAUserNativeQuery>();
+            //services.AddScoped<IDACar, DACarNativeQuery>();
+            //services.AddScoped<IDARental, DARentalNativeQuery>();
+            //services.AddScoped<IDARentalReturn, DARentalReturnNativeQuery>();
+            //services.AddScoped<IDAUser, DAUserNativeQuery>();
 
             return services;
         }

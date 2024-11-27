@@ -18,10 +18,9 @@ namespace Karent.API.Controllers
         private JwtHelper _jwtHelper;
         private readonly ILogger<UserController> _logger;
 
-        public UserController(KarentDBContext db, JwtHelper jwtHelper, ILogger<UserController> logger)
+        public UserController(IDAUser userService, JwtHelper jwtHelper, ILogger<UserController> logger)
         {
-            //_userService = new DAUserOrm(db);
-            _userService = new DAUserNativeQuery(db);
+            _userService = userService;
 
             _jwtHelper = jwtHelper;
             _logger = logger;

@@ -15,10 +15,9 @@ namespace Karent.API.Controllers
         private IDACar _carService;
         private readonly ILogger<CarController> _logger;
 
-        public CarController(KarentDBContext db, ILogger<CarController> logger)
+        public CarController(IDACar carService, ILogger<CarController> logger)
         {
-            //_carService = new DACarOrm(db);
-            _carService = new DACarNativeQuery(db);
+            _carService = carService;
             _logger = logger;
         }
 
