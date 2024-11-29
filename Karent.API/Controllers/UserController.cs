@@ -1,11 +1,8 @@
 ﻿using Karent.API.Helpers;
 using Karent.DataAccess.Interfaces;
-using Karent.DataAccess.NativeQuery;
-using Karent.DataModel;
 using Karent.ViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 
 namespace Karent.API.Controllers

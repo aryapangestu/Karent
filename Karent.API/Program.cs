@@ -1,4 +1,3 @@
-using System.Text;
 using Karent.API.Extensions;
 using Karent.API.Helpers;
 using Karent.DataModel;
@@ -6,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 
 namespace Karent.API
 {
