@@ -21,7 +21,14 @@ namespace Karent.ViewModel.Helpers
             }
 
             // Hash the password with the salt
-            using (var pbkdf2 = new Rfc2898DeriveBytes(password, salt, Iterations, HashAlgorithmName.SHA256))
+            using (
+                var pbkdf2 = new Rfc2898DeriveBytes(
+                    password,
+                    salt,
+                    Iterations,
+                    HashAlgorithmName.SHA256
+                )
+            )
             {
                 var hash = pbkdf2.GetBytes(HashSize);
 
@@ -46,7 +53,14 @@ namespace Karent.ViewModel.Helpers
             Array.Copy(hashBytes, 0, salt, 0, SaltSize);
 
             // Compute the hash of the entered password
-            using (var pbkdf2 = new Rfc2898DeriveBytes(enteredPassword, salt, Iterations, HashAlgorithmName.SHA256))
+            using (
+                var pbkdf2 = new Rfc2898DeriveBytes(
+                    enteredPassword,
+                    salt,
+                    Iterations,
+                    HashAlgorithmName.SHA256
+                )
+            )
             {
                 var enteredHash = pbkdf2.GetBytes(HashSize);
 
@@ -55,7 +69,10 @@ namespace Karent.ViewModel.Helpers
                 Array.Copy(hashBytes, SaltSize, storedHashBytes, 0, HashSize);
 
                 // Compare the hashes securely
-                return CryptographicOperations.FixedTimeEquals(enteredHash, storedHashBytes);
+                return CryptographicOperations.FixedTimeEquals(
+                    enteredHash,
+                    storedHashBytes
+                );
             }
         }
     }
